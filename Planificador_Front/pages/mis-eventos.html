@@ -1,0 +1,1286 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flow Events</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;1,700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/styles.css">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --green: #2ECC71;
+            --green-dark: #1a9e52;
+            --green-light: #d4f5e2;
+            --green-muted: rgba(46,204,113,0.12);
+            --bg: #f7f8f6;
+            --dark: #0d1117;
+            --text: #1a1a2e;
+            --muted: #6b7280;
+            --card-bg: #ffffff;
+            --border: #e5e7eb;
+            --radius: 18px;
+            --red: #ef4444;
+            --yellow: #f59e0b;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        /* ── NAVBAR ── */
+        .navbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 40px;
+            height: 64px;
+            background: rgba(247,248,246,0.92);
+            backdrop-filter: blur(12px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            font-size: 1rem;
+            color: var(--green);
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .nav-brand .brand-icon {
+            width: 28px;
+            height: 28px;
+            background: var(--green);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            color: white;
+        }
+
+        .nav-center {
+            display: flex;
+            gap: 4px;
+        }
+
+        .nav-center button {
+            background: none;
+            border: none;
+            padding: 8px 16px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--muted);
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .nav-center button:hover, .nav-center button.active {
+            color: var(--text);
+            background: rgba(0,0,0,0.05);
+        }
+
+        .nav-center button.active {
+            color: var(--green);
+            font-weight: 600;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .nav-right button, .nav-right a {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.875rem;
+            font-weight: 500;
+            padding: 8px 18px;
+            border-radius: 10px;
+            cursor: pointer;
+            text-decoration: none;
+            border: none;
+            transition: all 0.2s;
+        }
+
+        .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--green-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+        /* ── PAGE LAYOUT ── */
+        .page-wrap {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 48px 40px 80px;
+        }
+
+        /* ── PAGE HEADER ── */
+        .page-header {
+            margin-bottom: 32px;
+        }
+
+        .page-header h1 {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 6px;
+        }
+
+        .page-header p {
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+
+        /* ── SEARCH BAR ── */
+        .search-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 32px;
+            align-items: center;
+        }
+
+        .search-wrap {
+            flex: 1;
+            position: relative;
+        }
+
+        .search-wrap i {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--muted);
+            font-size: 0.85rem;
+        }
+
+        .search-wrap input {
+            width: 100%;
+            padding: 12px 16px 12px 42px;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.9rem;
+            color: var(--text);
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .search-wrap input::placeholder { color: var(--muted); }
+
+        .search-wrap input:focus {
+            border-color: var(--green);
+            box-shadow: 0 0 0 3px var(--green-muted);
+        }
+
+        .btn-filtros {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 20px;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-filtros:hover {
+            border-color: var(--green);
+            color: var(--green);
+        }
+
+        .filtros-dropdown {
+            display: none;
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            z-index: 50;
+            min-width: 200px;
+        }
+
+        .filtros-wrap {
+            position: relative;
+        }
+
+        .filtros-wrap.open .filtros-dropdown { display: block; }
+
+        .filtros-dropdown select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.875rem;
+            color: var(--text);
+            background: white;
+            outline: none;
+            margin-bottom: 10px;
+        }
+
+        .btn-limpiar-sm {
+            width: 100%;
+            padding: 9px;
+            background: var(--bg);
+            border: none;
+            border-radius: 8px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.8rem;
+            color: var(--muted);
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-limpiar-sm:hover { background: var(--border); }
+
+        /* ── FEATURED CARD (hero event) ── */
+        .featured-grid {
+            display: grid;
+            grid-template-columns: 1.6fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .featured-card {
+            border-radius: var(--radius);
+            overflow: hidden;
+            position: relative;
+            background: var(--dark);
+            min-height: 320px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .featured-card:hover { transform: scale(1.01); }
+
+        .featured-card .fc-img {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.7;
+        }
+
+        .featured-card .fc-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 55%);
+        }
+
+        .featured-card .fc-body {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 24px;
+            color: white;
+        }
+
+        .fc-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .badge-confirmado { background: var(--green); color: white; }
+        .badge-planificando { background: var(--yellow); color: white; }
+        .badge-finalizado { background: rgba(255,255,255,0.2); color: white; }
+        .badge-borrador { background: rgba(255,255,255,0.15); color: white; }
+
+        .fc-date-block {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            text-align: right;
+            color: white;
+        }
+
+        .fc-date-day {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.2rem;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .fc-date-month {
+            font-size: 0.85rem;
+            opacity: 0.8;
+            font-weight: 500;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .fc-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            line-height: 1.2;
+        }
+
+        .fc-location {
+            font-size: 0.82rem;
+            opacity: 0.75;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 16px;
+        }
+
+        .fc-tags {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 18px;
+        }
+
+        .fc-tag {
+            background: rgba(255,255,255,0.18);
+            border: 1px solid rgba(255,255,255,0.25);
+            border-radius: 20px;
+            padding: 3px 10px;
+            font-size: 0.72rem;
+            color: white;
+        }
+
+        .fc-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn-ver-detalles {
+            background: var(--green);
+            color: white;
+            border: none;
+            padding: 10px 22px;
+            border-radius: 10px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-ver-detalles:hover { background: var(--green-dark); }
+
+        /* Secondary featured card */
+        .secondary-card {
+            border-radius: var(--radius);
+            overflow: hidden;
+            background: white;
+            border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .secondary-card:hover {
+            border-color: var(--green);
+            box-shadow: 0 12px 30px rgba(46,204,113,0.12);
+        }
+
+        .sc-img {
+            height: 160px;
+            overflow: hidden;
+        }
+
+        .sc-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .secondary-card:hover .sc-img img { transform: scale(1.04); }
+
+        .sc-body {
+            padding: 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .sc-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 8px;
+            margin-top: 4px;
+        }
+
+        .sc-date {
+            font-size: 0.8rem;
+            color: var(--muted);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 16px;
+        }
+
+        .sc-date i { color: var(--green); font-size: 0.75rem; }
+
+        .btn-gestionar {
+            width: 100%;
+            padding: 11px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-gestionar:hover {
+            background: var(--green);
+            color: white;
+            border-color: var(--green);
+        }
+
+        /* ── LIST EVENTS ── */
+        .list-section {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .list-card {
+            background: white;
+            border-radius: 14px;
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 20px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+
+        .list-card:hover {
+            border-color: var(--green);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+        }
+
+        .list-thumb {
+            width: 64px;
+            height: 64px;
+            border-radius: 10px;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .list-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .list-info {
+            flex: 1;
+        }
+
+        .list-title {
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: var(--text);
+            margin-bottom: 4px;
+        }
+
+        .list-meta {
+            font-size: 0.8rem;
+            color: var(--muted);
+        }
+
+        .list-right {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex-shrink: 0;
+        }
+
+        .list-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+        }
+
+        .list-badge.confirmado { background: var(--green-light); color: var(--green-dark); }
+        .list-badge.planificando { background: #fef3c7; color: #92400e; }
+        .list-badge.finalizado { background: #f3f4f6; color: #6b7280; }
+
+        .btn-list-action {
+            background: none;
+            border: none;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--green);
+            cursor: pointer;
+            white-space: nowrap;
+            padding: 6px 14px;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .btn-list-action:hover {
+            background: var(--green-muted);
+        }
+
+        /* ── EMPTY STATE ── */
+        .empty-state {
+            text-align: center;
+            padding: 70px 30px;
+            background: white;
+            border-radius: var(--radius);
+            border: 1px dashed var(--border);
+        }
+
+        .empty-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--green-muted);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 1.5rem;
+        }
+
+        .empty-state h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.2rem;
+            color: var(--text);
+            margin-bottom: 8px;
+        }
+
+        .empty-state p {
+            color: var(--muted);
+            font-size: 0.875rem;
+            margin-bottom: 24px;
+        }
+
+        .btn-crear-evento {
+            background: var(--green);
+            color: white;
+            border: none;
+            padding: 12px 28px;
+            border-radius: 12px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-crear-evento:hover { background: var(--green-dark); }
+
+        /* ── LOADING ── */
+        .loading {
+            text-align: center;
+            padding: 60px;
+            color: var(--muted);
+        }
+
+        .spinner {
+            width: 36px;
+            height: 36px;
+            border: 3px solid var(--border);
+            border-top-color: var(--green);
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ── MODAL ── */
+        .modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.45);
+            backdrop-filter: blur(6px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 24px;
+            padding: 32px;
+            max-width: 520px;
+            width: 100%;
+            max-height: 85vh;
+            overflow-y: auto;
+            position: relative;
+            animation: modalIn 0.22s ease;
+        }
+
+        @keyframes modalIn {
+            from { opacity: 0; transform: translateY(16px) scale(0.97); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: var(--bg);
+            border: none;
+            font-size: 1rem;
+            cursor: pointer;
+            color: var(--muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .modal-close:hover { background: var(--border); color: var(--text); }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+            padding-bottom: 18px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .modal-header-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--green-muted);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--green);
+            font-size: 1rem;
+        }
+
+        .modal-header h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .detalle-grupo {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 16px;
+            background: var(--bg);
+            border-radius: 12px;
+            margin-bottom: 10px;
+        }
+
+        .detalle-grupo i {
+            width: 18px;
+            color: var(--green);
+            font-size: 0.85rem;
+            flex-shrink: 0;
+        }
+
+        .detalle-grupo strong {
+            color: var(--text);
+            font-size: 0.82rem;
+            font-weight: 600;
+            min-width: 90px;
+        }
+
+        .detalle-grupo span {
+            color: var(--muted);
+            font-size: 0.85rem;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            padding-top: 18px;
+            border-top: 1px solid var(--border);
+        }
+
+        .modal-actions button {
+            flex: 1;
+            padding: 11px;
+            border-radius: 10px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+        }
+
+        .btn-modal-confirmar {
+            background: var(--green);
+            color: white;
+        }
+
+        .btn-modal-confirmar:hover { background: var(--green-dark); }
+
+        .btn-modal-confirmar:disabled {
+            background: var(--border);
+            color: var(--muted);
+            cursor: not-allowed;
+        }
+
+        .btn-modal-eliminar {
+            background: #fee2e2;
+            color: var(--red);
+        }
+
+        .btn-modal-eliminar:hover { background: var(--red); color: white; }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 860px) {
+            .page-wrap { padding: 32px 20px 60px; }
+            .navbar { padding: 0 20px; }
+            .nav-center { display: none; }
+            .featured-grid { grid-template-columns: 1fr; }
+            .secondary-card { flex-direction: row; }
+            .sc-img { width: 140px; height: auto; }
+        }
+
+        @media (max-width: 560px) {
+            .secondary-card { flex-direction: column; }
+            .sc-img { width: 100%; height: 140px; }
+            .list-thumb { display: none; }
+            .modal-content { padding: 24px 18px; }
+        }
+
+        /* Thumbnail fallback colors per category */
+        .thumb-boda { background: linear-gradient(135deg, #f5e6d3, #e8c9a0); }
+        .thumb-cumple { background: linear-gradient(135deg, #d4f5e2, #a8e6c3); }
+        .thumb-grado { background: linear-gradient(135deg, #dce8ff, #b8d0f5); }
+        .thumb-quince { background: linear-gradient(135deg, #fce4f0, #f5b8d8); }
+        .thumb-default { background: linear-gradient(135deg, #e5e7eb, #d1d5db); }
+    </style>
+</head>
+<body>
+
+    <!-- ── NAVBAR ── -->
+    <nav class="navbar">
+        <div class="nav-brand" onclick="window.location.href='/index.html'">
+            <div class="brand-icon">✦</div>
+          Flow Events
+        </div>
+        <div class="nav-center" id="navCenter"></div>
+        <div class="nav-right" id="auth-buttons"></div>
+    </nav>
+
+    <!-- ── PAGE ── -->
+    <div class="page-wrap">
+
+        <div class="page-header">
+            <h1>Mis Eventos</h1>
+            <p>Gestiona tus reservas y explora los detalles de tus próximas experiencias personalizadas.</p>
+        </div>
+
+        <!-- Search -->
+        <div class="search-row">
+            <div class="search-wrap">
+                <i class="fas fa-search"></i>
+                <input type="text" id="filtroBusqueda" placeholder="Buscar por nombre o lugar..." onkeyup="filtrarEventos()">
+            </div>
+            <div class="filtros-wrap" id="filtrosWrap">
+                <button class="btn-filtros" onclick="toggleFiltros()">
+                    <i class="fas fa-sliders-h"></i> Filtros
+                </button>
+                <div class="filtros-dropdown">
+                    <select id="filtroEstado" onchange="filtrarEventos()">
+                        <option value="">Todos los estados</option>
+                        <option value="planificando">En proceso</option>
+                        <option value="confirmado">Confirmado</option>
+                    </select>
+                    <button class="btn-limpiar-sm" onclick="limpiarFiltros()">
+                        <i class="fas fa-eraser"></i> Limpiar filtros
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Eventos container -->
+        <div id="eventos-container">
+            <div class="loading">
+                <div class="spinner"></div>
+                Cargando tus eventos...
+            </div>
+        </div>
+
+    </div>
+
+    <script src="/js/api.js"></script>
+    <script>
+        let todosEventos = [];
+
+        // ── Thumbnail images per event type ──
+        const eventImages = {
+            boda:         'https://images.unsplash.com/photo-1519741497674-611481863552?w=600&q=80',
+            matrimonio:   'https://images.unsplash.com/photo-1519741497674-611481863552?w=600&q=80',
+            cumpleaños:   'https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=600&q=80',
+            cumple:       'https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=600&q=80',
+            graduacion:   'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=600&q=80',
+            grado:        'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=600&q=80',
+            quince:       'https://images.unsplash.com/photo-1500741236865-d60ef6f19b3c?w=600&q=80',
+            quinceañera:  'https://images.unsplash.com/photo-1500741236865-d60ef6f19b3c?w=600&q=80',
+            conferencia:  'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=600&q=80',
+            corporativo:  'https://images.unsplash.com/photo-1511578314322-379afb476865?w=600&q=80',
+            default:      'https://images.unsplash.com/photo-1464207687429-7505649dae38?w=600&q=80'
+        };
+
+        function getEventImage(evento) {
+            if (!evento.tipo_evento) return eventImages.default;
+            const tipo = evento.tipo_evento.toLowerCase();
+            for (const key of Object.keys(eventImages)) {
+                if (tipo.includes(key)) return eventImages[key];
+            }
+            return eventImages.default;
+        }
+
+        function getThumbClass(evento) {
+            if (!evento.tipo_evento) return 'thumb-default';
+            const tipo = evento.tipo_evento.toLowerCase();
+            if (tipo.includes('boda') || tipo.includes('matrimonio')) return 'thumb-boda';
+            if (tipo.includes('cumple')) return 'thumb-cumple';
+            if (tipo.includes('grado') || tipo.includes('graduac')) return 'thumb-grado';
+            if (tipo.includes('quince')) return 'thumb-quince';
+            return 'thumb-default';
+        }
+
+        function getBadgeClass(estado) {
+            switch (estado) {
+                case 'confirmado': return 'badge-confirmado';
+                case 'planificando': return 'badge-planificando';
+                default: return 'badge-borrador';
+            }
+        }
+
+        function getBadgeLabel(estado) {
+            switch (estado) {
+                case 'confirmado': return 'Confirmado';
+                case 'planificando': return 'En Proceso';
+                default: return 'Borrador';
+            }
+        }
+
+        function getListBadgeClass(estado) {
+            switch (estado) {
+                case 'confirmado': return 'confirmado';
+                case 'planificando': return 'planificando';
+                default: return 'finalizado';
+            }
+        }
+
+        function getListActionLabel(estado) {
+            if (estado === 'confirmado') return 'Ver Detalles';
+            if (estado === 'planificando') return 'Gestionar';
+            return 'Revisar Galería';
+        }
+
+        function formatDateShort(fecha) {
+            if (!fecha) return { day: '--', month: '---', year: '----' };
+            const d = new Date(fecha);
+            return {
+                day: d.getDate(),
+                month: d.toLocaleDateString('es-CO', { month: 'short' }).toUpperCase(),
+                year: d.getFullYear()
+            };
+        }
+
+        function formatDateFull(fecha) {
+            if (!fecha) return 'Fecha no especificada';
+            const d = new Date(fecha);
+            return d.toLocaleDateString('es-CO', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+        }
+
+        function formatDateMeta(fecha) {
+            if (!fecha) return 'Fecha no especificada';
+            const d = new Date(fecha);
+            const day = d.getDate();
+            const month = d.toLocaleDateString('es-CO', { month: 'long' });
+            return `${day} de ${month.charAt(0).toUpperCase() + month.slice(1)}`;
+        }
+
+        function escapeHTML(str) {
+            if (!str) return '';
+            return str.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+        }
+
+        // ── NAVBAR POR ROL ──
+        function actualizarNavbarMisEventos() {
+            const navCenter = document.getElementById('navCenter');
+            if (!navCenter) return;
+
+            const esAdmin = typeof usuarioActual !== 'undefined' && usuarioActual && usuarioActual.rol === 'admin';
+
+            let botones = `
+                <button onclick="window.location.href='/index.html'">Inicio</button>
+                <button onclick="window.location.href='/pages/chatbot.html'">Crear Evento</button>
+                <button class="active" onclick="window.location.href='/pages/mis-eventos.html'">Mis Eventos</button>               
+            `;
+
+            if (esAdmin) {
+                botones += `
+                    <button onclick="window.location.href='/pages/admin/usuarios.html'">Usuarios</button>
+                    <button onclick="window.location.href='/pages/admin/proveedores.html'">Proveedores</button>
+                    <button onclick="window.location.href='/pages/admin/planes.html'">Planes</button>
+                `;
+            }
+
+            navCenter.innerHTML = botones;
+        }
+
+        // ── CARGAR EVENTOS ──
+        async function cargarMisEventos() {
+            const container = document.getElementById('eventos-container');
+            if (!container) return;
+
+            if (typeof usuarioActual === 'undefined' || !usuarioActual) {
+                window.location.href = '/pages/login.html';
+                return;
+            }
+
+            container.innerHTML = `<div class="loading"><div class="spinner"></div>Cargando tus eventos...</div>`;
+
+            try {
+                const eventos = await apiRequest(`/eventos/usuario/${usuarioActual.id}/`);
+                todosEventos = eventos;
+
+                if (!eventos.length) {
+                    renderEmpty(container);
+                    return;
+                }
+
+                renderEventos(eventos);
+
+            } catch (error) {
+                console.error(error);
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">⚠️</div>
+                        <h3>Error al cargar</h3>
+                        <p>No se pudieron cargar los eventos. Intenta de nuevo.</p>
+                        <button class="btn-crear-evento" onclick="cargarMisEventos()">Reintentar</button>
+                    </div>`;
+            }
+        }
+
+        function renderEmpty(container) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon">📋</div>
+                    <h3>Sin eventos aún</h3>
+                    <p>No tienes eventos guardados. ¡Crea tu primera experiencia!</p>
+                    <button class="btn-crear-evento" onclick="window.location.href='/pages/chatbot.html'">
+                        <i class="fas fa-plus"></i> Crear mi primer evento
+                    </button>
+                </div>`;
+        }
+
+        function renderEventos(eventos) {
+            const container = document.getElementById('eventos-container');
+            if (!container) return;
+
+            if (!eventos.length) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">🔍</div>
+                        <h3>Sin resultados</h3>
+                        <p>No se encontraron eventos con esos filtros.</p>
+                    </div>`;
+                return;
+            }
+
+            // Split: featured (first 2) + list (rest)
+            const [featured, secondary, ...rest] = eventos;
+
+            let html = '';
+
+            // Featured grid
+            if (featured) {
+                const fd = formatDateShort(featured.fecha_evento);
+                const img = getEventImage(featured);
+
+                html += `<div class="featured-grid" style="margin-bottom:20px">`;
+
+                // Main featured
+                html += `
+                    <div class="featured-card" onclick="verDetalleEvento(${featured.id})">
+                        <img class="fc-img" src="${img}" alt="${escapeHTML(featured.nombre)}"
+                             onerror="this.src='${eventImages.default}'">
+                        <div class="fc-overlay"></div>
+                        <div class="fc-date-block">
+                            <div class="fc-date-day">${fd.day}</div>
+                            <div class="fc-date-month">${fd.month}<br>${fd.year}</div>
+                        </div>
+                        <div class="fc-body">
+                            <div class="fc-badge ${getBadgeClass(featured.estado)}">${getBadgeLabel(featured.estado)}</div>
+                            <div class="fc-title">${escapeHTML(featured.nombre)}</div>
+                            <div class="fc-location"><i class="fas fa-map-marker-alt"></i>${escapeHTML(featured.ciudad || 'Florencia, Caquetá')}</div>
+                            <div class="fc-actions">
+                                <button class="btn-ver-detalles" onclick="event.stopPropagation(); verDetalleEvento(${featured.id})">Ver Detalles</button>
+                            </div>
+                        </div>
+                    </div>`;
+
+                // Secondary card
+                if (secondary) {
+                    const sd = formatDateShort(secondary.fecha_evento);
+                    const simg = getEventImage(secondary);
+                    html += `
+                        <div class="secondary-card" onclick="verDetalleEvento(${secondary.id})">
+                            <div class="sc-img">
+                                <img src="${simg}" alt="${escapeHTML(secondary.nombre)}"
+                                     onerror="this.src='${eventImages.default}'">
+                            </div>
+                            <div class="sc-body">
+                                <div>
+                                    <div class="fc-badge ${getBadgeClass(secondary.estado)}" style="margin-bottom:8px">${getBadgeLabel(secondary.estado)}</div>
+                                    <div class="sc-title">${escapeHTML(secondary.nombre)}</div>
+                                    <div class="sc-date"><i class="fas fa-calendar"></i>${formatDateMeta(secondary.fecha_evento)}</div>
+                                </div>
+                                <button class="btn-gestionar" onclick="event.stopPropagation(); verDetalleEvento(${secondary.id})">Gestionar</button>
+                            </div>
+                        </div>`;
+                }
+
+                html += `</div>`;
+            }
+
+            // List cards (rest)
+            if (rest.length > 0) {
+                html += `<div class="list-section">`;
+                html += rest.map(e => {
+                    const img = getEventImage(e);
+                    const actionLabel = getListActionLabel(e.estado);
+                    return `
+                        <div class="list-card" onclick="verDetalleEvento(${e.id})">
+                            <div class="list-thumb ${getThumbClass(e)}">
+                                <img src="${img}" alt="${escapeHTML(e.nombre)}"
+                                     onerror="this.style.display='none'">
+                            </div>
+                            <div class="list-info">
+                                <div class="list-title">${escapeHTML(e.nombre)}</div>
+                                <div class="list-meta">${escapeHTML(e.ciudad || 'Florencia, Caquetá')} • ${formatDateMeta(e.fecha_evento)}</div>
+                            </div>
+                            <div class="list-right">
+                                <span class="list-badge ${getListBadgeClass(e.estado)}">${getBadgeLabel(e.estado)}</span>
+                                <button class="btn-list-action" onclick="event.stopPropagation(); verDetalleEvento(${e.id})">${actionLabel}</button>
+                            </div>
+                        </div>`;
+                }).join('');
+                html += `</div>`;
+            }
+
+            container.innerHTML = html;
+        }
+
+        // ── FILTROS ──
+        function toggleFiltros() {
+            document.getElementById('filtrosWrap').classList.toggle('open');
+        }
+
+        document.addEventListener('click', (e) => {
+            const wrap = document.getElementById('filtrosWrap');
+            if (wrap && !wrap.contains(e.target)) wrap.classList.remove('open');
+        });
+
+        function filtrarEventos() {
+            const busqueda = document.getElementById('filtroBusqueda').value.toLowerCase();
+            const estadoFiltro = document.getElementById('filtroEstado').value;
+
+            let filtrados = todosEventos;
+
+            if (busqueda) {
+                filtrados = filtrados.filter(e =>
+                    (e.nombre && e.nombre.toLowerCase().includes(busqueda)) ||
+                    (e.tipo_evento && e.tipo_evento.toLowerCase().includes(busqueda)) ||
+                    (e.ciudad && e.ciudad.toLowerCase().includes(busqueda))
+                );
+            }
+
+            if (estadoFiltro) {
+                filtrados = filtrados.filter(e => e.estado === estadoFiltro);
+            }
+
+            renderEventos(filtrados);
+        }
+
+        function limpiarFiltros() {
+            document.getElementById('filtroBusqueda').value = '';
+            document.getElementById('filtroEstado').value = '';
+            document.getElementById('filtrosWrap').classList.remove('open');
+            renderEventos(todosEventos);
+        }
+
+        // ── MODAL DETALLE ──
+        async function verDetalleEvento(eventoId) {
+            try {
+                const evento = await apiRequest(`/eventos/${eventoId}/`);
+                const puedeConfirmar = evento.estado !== 'confirmado';
+
+                const modal = document.createElement('div');
+                modal.className = 'modal';
+                modal.innerHTML = `
+                    <div class="modal-content">
+                        <button class="modal-close" onclick="this.closest('.modal').remove()">✕</button>
+                        <div class="modal-header">
+                            <div class="modal-header-icon"><i class="fas fa-calendar-alt"></i></div>
+                            <h2>${escapeHTML(evento.nombre)}</h2>
+                        </div>
+                        <div class="modal-body">
+                            <div class="detalle-grupo">
+                                <i class="fas fa-tag"></i>
+                                <strong>Tipo:</strong>
+                                <span>${escapeHTML(evento.tipo_evento) || 'No especificado'}</span>
+                            </div>
+                            <div class="detalle-grupo">
+                                <i class="fas fa-calendar"></i>
+                                <strong>Fecha:</strong>
+                                <span>${evento.fecha_evento ? formatDateFull(evento.fecha_evento) : 'No especificada'}</span>
+                            </div>
+                            <div class="detalle-grupo">
+                                <i class="fas fa-users"></i>
+                                <strong>Personas:</strong>
+                                <span>${evento.num_personas || 'No especificado'}</span>
+                            </div>
+                            <div class="detalle-grupo">
+                                <i class="fas fa-dollar-sign"></i>
+                                <strong>Presupuesto:</strong>
+                                <span>$${(evento.presupuesto_total || 0).toLocaleString('es-CO')} COP</span>
+                            </div>
+                            <div class="detalle-grupo">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <strong>Ciudad:</strong>
+                                <span>${escapeHTML(evento.ciudad) || 'No especificada'}</span>
+                            </div>
+                            <div class="detalle-grupo">
+                                <i class="fas fa-info-circle"></i>
+                                <strong>Estado:</strong>
+                                <span>${getBadgeLabel(evento.estado)}</span>
+                            </div>
+                        </div>
+                        <div class="modal-actions">
+                            ${puedeConfirmar ? `<button class="btn-modal-confirmar" onclick="confirmarEvento(${evento.id}, this)">
+                                <i class="fas fa-check"></i> Confirmar
+                            </button>` : ''}
+                            <button class="btn-modal-eliminar" onclick="eliminarEventoConfirmar(${evento.id})">
+                                <i class="fas fa-trash"></i> Eliminar
+                            </button>
+                        </div>
+                    </div>`;
+
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) modal.remove();
+                });
+
+                document.body.appendChild(modal);
+
+            } catch (error) {
+                console.error(error);
+                alert('Error al cargar los detalles del evento.');
+            }
+        }
+
+        // ── CONFIRMAR EVENTO ──
+        async function confirmarEvento(eventoId, btn) {
+            if (!confirm('¿Confirmar este evento?')) return;
+            if (btn) { btn.disabled = true; btn.textContent = 'Confirmando...'; }
+            try {
+                const resultado = await actualizarEvento(eventoId, { estado: 'confirmado' });
+                if (resultado && resultado.success) {
+                    document.querySelector('.modal')?.remove();
+                    cargarMisEventos();
+                } else {
+                    alert('Error al confirmar el evento.');
+                    if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-check"></i> Confirmar'; }
+                }
+            } catch (error) {
+                alert('Error al confirmar.');
+                if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-check"></i> Confirmar'; }
+            }
+        }
+
+        // ── ELIMINAR EVENTO ──
+        async function eliminarEventoConfirmar(eventoId) {
+            if (!confirm('¿Estás seguro de que quieres eliminar este evento?')) return;
+            try {
+                const resultado = await eliminarEvento(eventoId);
+                if (resultado && resultado.success) {
+                    document.querySelector('.modal')?.remove();
+                    cargarMisEventos();
+                } else {
+                    alert('Error al eliminar el evento.');
+                }
+            } catch (error) {
+                alert('Error al eliminar.');
+            }
+        }
+
+        // ── INIT ──
+        document.addEventListener('DOMContentLoaded', () => {
+            actualizarNavbarMisEventos();
+            cargarMisEventos();
+        });
+    </script>
+</body>
+</html>

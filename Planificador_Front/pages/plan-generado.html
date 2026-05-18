@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plan Generado - Planificador IA</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <nav class="navbar">
+            <div class="nav-brand">🎉 Planificador IA</div>
+            <div class="nav-center">
+                <button onclick="window.location.href='/index.html'">🏠 Inicio</button>
+                <button onclick="window.location.href='/pages/chatbot.html'">✨ Crear Evento</button>
+                <button onclick="window.location.href='/pages/mis-eventos.html'">📋 Mis Eventos</button>
+            </div>
+            <div class="nav-right" id="auth-buttons"></div>
+        </nav>
+
+        <div id="plan-content" class="card"></div>
+    </div>
+
+    <script src="/js/api.js"></script>
+    <script>
+        mostrarPlanDesdeLocalStorage();
+    </script>
+</body>
+</html>

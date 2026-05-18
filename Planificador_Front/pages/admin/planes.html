@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flow Events</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/styles.css">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --green: #2ECC71;
+            --green-dark: #1a9e52;
+            --green-deep: #0f7a3a;
+            --green-light: #d4f5e2;
+            --green-muted: rgba(46,204,113,0.12);
+            --bg: #f7f8f6;
+            --text: #1a1a2e;
+            --muted: #6b7280;
+            --border: #e5e7eb;
+            --radius: 16px;
+            --red: #ef4444;
+            --yellow: #f59e0b;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        /* ── NAVBAR ── */
+        .navbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 40px;
+            height: 60px;
+            background: rgba(247,248,246,0.95);
+            backdrop-filter: blur(12px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: var(--green);
+            cursor: pointer;
+        }
+
+        .nav-brand .brand-icon {
+            width: 26px;
+            height: 26px;
+            background: var(--green);
+            border-radius: 7px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.78rem;
+            color: white;
+        }
+
+        .nav-center { display: flex; gap: 4px; }
+
+        .nav-center button {
+            background: none;
+            border: none;
+            padding: 7px 14px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--muted);
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .nav-center button:hover { color: var(--text); }
+        .nav-center button.active { color: var(--text); font-weight: 600; }
+        .nav-center button.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 2px;
+            background: var(--green);
+            border-radius: 2px;
+        }
+
+        .nav-right { display: flex; align-items: center; gap: 10px; }
+
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--green-light);
+            overflow: hidden;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid rgba(46,204,113,0.3);
+        }
+
+        .avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .avatar i { font-size: 0.8rem; color: var(--green-dark); }
+
+        /* ── PAGE WRAP ── */
+        .page-wrap {
+            max-width: 1140px;
+            margin: 0 auto;
+            padding: 36px 40px 80px;
+        }
+
+        /* ── PAGE HEADER ── */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .page-header-left h1 {
+            font-size: 1.9rem;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 6px;
+        }
+
+        .page-header-left p {
+            font-size: 0.875rem;
+            color: var(--muted);
+        }
+
+        .btn-nuevo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--green);
+            color: white;
+            border: none;
+            padding: 11px 22px;
+            border-radius: 10px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .btn-nuevo:hover { background: var(--green-dark); }
+
+        /* ── STAT CARDS — split horizontal ── */
+        .stats-split {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+
+        .stat-half {
+            border-radius: var(--radius);
+            padding: 22px 24px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .stat-half.light {
+            background: white;
+            border: 1px solid var(--border);
+        }
+
+        .stat-half.dark {
+            background: linear-gradient(135deg, var(--green-dark) 0%, var(--green-deep) 100%);
+            color: white;
+        }
+
+        .stat-half-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+
+        .stat-half.light .stat-half-icon {
+            background: var(--green-muted);
+            color: var(--green-dark);
+        }
+
+        .stat-half.dark .stat-half-icon {
+            background: rgba(255,255,255,0.15);
+            color: white;
+        }
+
+
+        .stat-half-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            margin-bottom: 4px;
+        }
+
+        .stat-half.light .stat-half-label { color: var(--muted); }
+        .stat-half.dark  .stat-half-label { color: rgba(255,255,255,0.75); }
+
+        .stat-half-val {
+            font-size: 2rem;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .stat-half.light .stat-half-val { color: var(--text); }
+        .stat-half.dark  .stat-half-val { color: white; }
+
+        /* ── SEARCH + FILTER ROW ── */
+        .filter-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+        }
+
+        .search-wrap {
+            position: relative;
+            min-width: 220px;
+        }
+
+        .search-wrap i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--muted);
+            font-size: 0.78rem;
+        }
+
+        .search-wrap input {
+            width: 100%;
+            padding: 9px 14px 9px 34px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.875rem;
+            color: var(--text);
+            background: white;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .search-wrap input::placeholder { color: var(--muted); }
+        .search-wrap input:focus {
+            border-color: var(--green);
+            box-shadow: 0 0 0 3px var(--green-muted);
+        }
+
+        /* Filter pills */
+        .filter-pills {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .pill {
+            padding: 7px 16px;
+            border-radius: 20px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.82rem;
+            font-weight: 500;
+            cursor: pointer;
+            border: 1px solid var(--border);
+            background: white;
+            color: var(--muted);
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .pill:hover { border-color: var(--green); color: var(--green); }
+        .pill.active { background: var(--green); border-color: var(--green); color: white; }
+
+        /* ── TABLE ── */
+        .table-section {
+            background: white;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            overflow: hidden;
+        }
+
+        .table-overflow { overflow-x: auto; }
+
+        .admin-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+
+        .admin-table thead th {
+            padding: 12px 20px;
+            text-align: left;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--muted);
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            background: var(--bg);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .admin-table tbody tr {
+            border-bottom: 1px solid var(--border);
+            transition: background 0.15s;
+        }
+
+        .admin-table tbody tr:last-child { border-bottom: none; }
+        .admin-table tbody tr:hover { background: #fafffe; }
+
+        .admin-table td {
+            padding: 14px 20px;
+            font-size: 0.875rem;
+            color: var(--text);
+            vertical-align: middle;
+        }
+
+        .td-id { color: var(--muted); font-size: 0.82rem; font-weight: 500; }
+
+        .td-nombre { font-weight: 600; }
+
+        /* Event type pill */
+        .tipo-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 10px;
+            border-radius: 7px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .tipo-boda        { background: rgba(236,72,153,0.1);  color: #be185d; }
+        .tipo-cumple      { background: rgba(245,158,11,0.1);  color: #b45309; }
+        .tipo-grado       { background: rgba(99,102,241,0.1);  color: #4338ca; }
+        .tipo-quince      { background: rgba(168,85,247,0.1);  color: #7c3aed; }
+        .tipo-default     { background: rgba(107,114,128,0.1); color: #6b7280; }
+
+        /* Precio tachado */
+        .precio-base-tachado {
+            text-decoration: line-through;
+            color: var(--muted);
+            font-size: 0.82rem;
+        }
+
+        /* Descuento badge */
+        .desc-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 9px;
+            border-radius: 6px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            background: rgba(239,68,68,0.1);
+            color: var(--red);
+        }
+
+        .no-desc {
+            color: var(--muted);
+            font-size: 0.8rem;
+        }
+
+        /* Precio final */
+        .precio-final {
+            font-weight: 700;
+            color: var(--green-dark);
+            font-size: 0.95rem;
+        }
+
+        /* Text actions */
+        .action-links {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            justify-content: flex-end;
+        }
+
+        .link-edit {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--green-dark);
+            cursor: pointer;
+            background: none;
+            border: none;
+            font-family: 'DM Sans', sans-serif;
+            transition: opacity 0.2s;
+            letter-spacing: 0.2px;
+        }
+
+        .link-edit:hover { opacity: 0.7; }
+
+        .link-del {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--red);
+            cursor: pointer;
+            background: none;
+            border: none;
+            font-family: 'DM Sans', sans-serif;
+            transition: opacity 0.2s;
+            letter-spacing: 0.2px;
+        }
+
+        .link-del:hover { opacity: 0.7; }
+
+        /* ── TABLE FOOTER ── */
+        .table-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 13px 20px;
+            border-top: 1px solid var(--border);
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .table-count { font-size: 0.8rem; color: var(--muted); }
+
+        .pagination { display: flex; align-items: center; gap: 4px; }
+
+        .page-btn {
+            width: 30px;
+            height: 30px;
+            border-radius: 7px;
+            border: 1px solid var(--border);
+            background: white;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--text);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .page-btn:hover { border-color: var(--green); color: var(--green); }
+        .page-btn.active { background: var(--green); border-color: var(--green); color: white; }
+        .page-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+        /* ── EMPTY ── */
+        .table-empty {
+            text-align: center;
+            padding: 50px 20px;
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+
+        /* ── MODAL ── */
+        .modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(6px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 28px;
+            max-width: 460px;
+            width: 100%;
+            animation: modalIn 0.22s ease;
+        }
+
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.96) translateY(10px); }
+            to   { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .modal-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            font-size: 1rem;
+            color: var(--text);
+            margin-bottom: 22px;
+        }
+
+        .modal-title .m-icon {
+            width: 34px;
+            height: 34px;
+            background: var(--green-muted);
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--green-dark);
+            font-size: 0.9rem;
+        }
+
+        .modal-field { margin-bottom: 14px; }
+
+        .modal-field label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+
+        .modal-field input {
+            width: 100%;
+            padding: 10px 13px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.875rem;
+            color: var(--text);
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .modal-field input:focus { border-color: var(--green); }
+
+        .modal-footer {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+            padding-top: 18px;
+            border-top: 1px solid var(--border);
+        }
+
+        .btn-modal-cancel {
+            padding: 10px 20px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--muted);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-modal-cancel:hover { border-color: var(--text); color: var(--text); }
+
+        .btn-modal-save {
+            padding: 10px 22px;
+            background: var(--green);
+            border: none;
+            border-radius: 10px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: white;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-modal-save:hover { background: var(--green-dark); }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 860px) {
+            .page-wrap { padding: 28px 20px 60px; }
+            .navbar { padding: 0 20px; }
+            .nav-center { display: none; }
+            .stats-split { grid-template-columns: 1fr; }
+            .page-header { flex-direction: column; }
+        }
+
+        @media (max-width: 560px) {
+            .filter-row { flex-direction: column; align-items: stretch; }
+            .search-wrap { min-width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ── NAVBAR ── -->
+    <nav class="navbar">
+        <div class="nav-brand" onclick="window.location.href='/index.html'">
+            <div class="brand-icon">✦</div>
+           Flow Events
+        </div>
+        <div class="nav-center" id="navCenter"></div>
+        <div class="nav-right" id="auth-buttons">
+            <div class="avatar"><i class="fas fa-user"></i></div>
+        </div>
+    </nav>
+
+    <div class="page-wrap">
+
+        <!-- ── HEADER ── -->
+        <div class="page-header">
+            <div class="page-header-left">
+                <h1>Planes y Paquetes</h1>
+                <p>Administra la oferta de servicios y configuraciones de precios para eventos.</p>
+            </div>
+            <button class="btn-nuevo" onclick="abrirNuevoPaquete()">
+                <i class="fas fa-th-large"></i> Nuevo Paquete
+            </button>
+        </div>
+
+        <!-- ── STAT CARDS ── -->
+        <div class="stats-split">
+            <div class="stat-half light">
+                <div class="stat-half-icon"><i class="fas fa-box-open"></i></div>
+                <div class="stat-half-info">
+                    <div class="stat-half-label">Total Paquetes</div>
+                    <div class="stat-half-val" id="totalPaquetes">0</div>
+                </div>
+            </div>
+            <div class="stat-half dark">
+                <div class="stat-half-icon"><i class="fas fa-sitemap"></i></div>
+                <div class="stat-half-info">
+                    <div class="stat-half-label">Tipos de Evento</div>
+                    <div class="stat-half-val" id="tiposEvento">0</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── SEARCH + PILLS ── -->
+        <div class="filter-row">
+            <div class="search-wrap">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="Buscar paquetes..."
+                       oninput="filtrarPaquetes()" onkeyup="filtrarPaquetes()">
+            </div>
+        </div>
+
+        <div class="filter-row" style="margin-bottom:20px">
+            <div class="filter-pills">
+                <button class="pill active" onclick="filterByTipo('todos', this)">Todos</button>
+                <button class="pill" onclick="filterByTipo('Boda', this)">💍 Boda</button>
+                <button class="pill" onclick="filterByTipo('Cumpleaños', this)">🎂 Cumpleaños</button>
+                <button class="pill" onclick="filterByTipo('Grado', this)">🎓 Grado</button>
+                <button class="pill" onclick="filterByTipo('Quinceañera', this)">👗 Quinceañera</button>
+            </div>
+        </div>
+
+        <!-- ── TABLE ── -->
+        <div class="table-section">
+            <div class="table-overflow">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>NOMBRE</th>
+                            <th>TIPO DE EVENTO</th>
+                            <th>PRECIO BASE</th>
+                            <th>DESCUENTO</th>
+                            <th>PRECIO FINAL</th>
+                            <th style="text-align:right">ACCIONES</th>
+                        </tr>
+                    </thead>
+                    <tbody id="paquetesTableBody">
+                        <tr><td colspan="7" class="table-empty">Cargando paquetes...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="table-footer">
+                <div class="table-count" id="tableCount">Cargando...</div>
+                <div class="pagination" id="pagination"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="/js/api.js"></script>
+    <script>
+        let todosPaquetes = [];
+        let currentFilter = 'todos';
+        let currentSearch = '';
+        let currentPage = 1;
+        const PER_PAGE = 8;
+
+        // ── TIPO HELPERS ──
+        function getTipoInfo(tipoEvento) {
+            const t = (tipoEvento || '').toLowerCase();
+            if (t.includes('boda'))      return { cls: 'tipo-boda',   emoji: '💍', label: 'Boda' };
+            if (t.includes('cumple'))    return { cls: 'tipo-cumple', emoji: '🎂', label: 'Cumpleaños' };
+            if (t.includes('grado') || t.includes('gradu')) return { cls: 'tipo-grado', emoji: '🎓', label: 'Grado' };
+            if (t.includes('quince'))    return { cls: 'tipo-quince', emoji: '👗', label: 'Quinceañera' };
+            return { cls: 'tipo-default', emoji: '📦', label: tipoEvento || 'Otro' };
+        }
+
+        // ── NAVBAR ──
+        function actualizarNavbarAdmin() {
+            const navCenter = document.getElementById('navCenter');
+            if (!navCenter) return;
+            const esAdmin = typeof usuarioActual !== 'undefined' && usuarioActual && usuarioActual.rol === 'admin';
+            let botones = `<button onclick="window.location.href='/index.html'">Inicio</button>`;
+            if (esAdmin) {
+                botones += `
+                    <button onclick="window.location.href='/pages/admin/usuarios.html'">Usuarios</button>
+                    <button onclick="window.location.href='/pages/admin/proveedores.html'">Proveedores</button>
+                    <button class="active" onclick="window.location.href='/pages/admin/planes.html'">Planes</button>
+                `;
+            }
+            navCenter.innerHTML = botones;
+        }
+
+        // ── CARGAR PAQUETES ──
+        async function cargarPaquetes() {
+            try {
+                const paquetes = await apiRequest('/paquetes/');
+                todosPaquetes = paquetes;
+                actualizarEstadisticas();
+                renderizarTabla();
+            } catch (error) {
+                console.error('Error al cargar paquetes:', error);
+                todosPaquetes = [
+                    { id: 1, nombre: 'Paquete Boda Premium',   tipoEvento: 'Boda',        precioBase: 6000000, descuentoPct: 15 },
+                    { id: 2, nombre: 'Paquete Boda Básico',    tipoEvento: 'Boda',        precioBase: 4000000, descuentoPct: 10 },
+                    { id: 3, nombre: 'Paquete Grado',          tipoEvento: 'Grado',       precioBase: 3500000, descuentoPct: 8  },
+                    { id: 4, nombre: 'Paquete Quinceañera',    tipoEvento: 'Quinceañera', precioBase: 5000000, descuentoPct: 12 },
+                    { id: 5, nombre: 'Paquete Cumpleaños',     tipoEvento: 'Cumpleaños',  precioBase: 2500000, descuentoPct: 5  },
+                ];
+                actualizarEstadisticas();
+                renderizarTabla();
+            }
+        }
+
+        // ── ESTADÍSTICAS ──
+        function actualizarEstadisticas() {
+            document.getElementById('totalPaquetes').textContent = todosPaquetes.length;
+            const tipos = new Set(todosPaquetes.map(p => p.tipoEvento || p.tipo_evento || 'N/A')).size;
+            document.getElementById('tiposEvento').textContent = tipos;
+        }
+
+        function calcularPrecioFinal(precioBase, descuento) {
+            if (!descuento || descuento === 0) return precioBase;
+            return precioBase - (precioBase * descuento / 100);
+        }
+
+        function formatCOP(n) {
+            return '$' + Number(n).toLocaleString('es-CO');
+        }
+
+        // ── FILTRAR ──
+        function filtrarPaquetes() {
+            currentSearch = document.getElementById('searchInput').value.toLowerCase();
+            currentPage = 1;
+            renderizarTabla();
+        }
+
+        function filterByTipo(tipo, btn) {
+            currentFilter = tipo;
+            currentPage = 1;
+            document.querySelectorAll('.pill').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderizarTabla();
+        }
+
+        // ── RENDER TABLE ──
+        function renderizarTabla() {
+            let filtrados = [...todosPaquetes];
+
+            if (currentFilter !== 'todos') {
+                filtrados = filtrados.filter(p =>
+                    (p.tipoEvento || p.tipo_evento || '') === currentFilter
+                );
+            }
+
+            if (currentSearch) {
+                filtrados = filtrados.filter(p =>
+                    (p.nombre && p.nombre.toLowerCase().includes(currentSearch)) ||
+                    ((p.tipoEvento || p.tipo_evento || '').toLowerCase().includes(currentSearch))
+                );
+            }
+
+            const total = filtrados.length;
+            const totalPages = Math.ceil(total / PER_PAGE) || 1;
+            const start = (currentPage - 1) * PER_PAGE;
+            const page = filtrados.slice(start, start + PER_PAGE);
+
+            document.getElementById('tableCount').textContent =
+                `Mostrando ${total === 0 ? 0 : start + 1} a ${Math.min(start + PER_PAGE, total)} de ${total} paquetes`;
+
+            const tbody = document.getElementById('paquetesTableBody');
+
+            if (page.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="table-empty">📭 No se encontraron paquetes</td></tr>';
+                renderPagination(0, 0);
+                return;
+            }
+
+            tbody.innerHTML = page.map(p => {
+                const precioBase  = p.precioBase || p.precio_base || 0;
+                const descuento   = p.descuentoPct || p.descuento || 0;
+                const precioFinal = calcularPrecioFinal(precioBase, descuento);
+                const tipo        = p.tipoEvento || p.tipo_evento || 'Otro';
+                const ti          = getTipoInfo(tipo);
+
+                const descHtml = descuento > 0
+                    ? `<span class="desc-badge"><i class="fas fa-tag" style="font-size:0.6rem"></i> ${descuento}% OFF</span>`
+                    : `<span class="no-desc">—</span>`;
+
+                const precioBaseHtml = descuento > 0
+                    ? `<span class="precio-base-tachado">${formatCOP(precioBase)}</span>`
+                    : `<span style="color:var(--muted);font-size:0.875rem">${formatCOP(precioBase)}</span>`;
+
+                return `
+                <tr>
+                    <td class="td-id">${p.id}</td>
+                    <td class="td-nombre">${escapeHTML(p.nombre)}</td>
+                    <td><span class="tipo-pill ${ti.cls}">${ti.emoji} ${ti.label}</span></td>
+                    <td>${precioBaseHtml}</td>
+                    <td>${descHtml}</td>
+                    <td><span class="precio-final">${formatCOP(precioFinal)}</span></td>
+                    <td>
+                        <div class="action-links">
+                            <button class="link-edit" onclick="editarPaquete(${p.id})">EDITAR</button>
+                            <button class="link-del"  onclick="eliminarPaquete(${p.id})">ELIMINAR</button>
+                        </div>
+                    </td>
+                </tr>`;
+            }).join('');
+
+            renderPagination(currentPage, totalPages);
+        }
+
+        // ── PAGINATION ──
+        function renderPagination(current, total) {
+            const container = document.getElementById('pagination');
+            if (total <= 1) { container.innerHTML = ''; return; }
+
+            let html = `<button class="page-btn" onclick="goPage(${current - 1})" ${current === 1 ? 'disabled' : ''}>
+                <i class="fas fa-chevron-left" style="font-size:0.6rem"></i>
+            </button>`;
+
+            for (let i = 1; i <= Math.min(total, 7); i++) {
+                html += `<button class="page-btn ${i === current ? 'active' : ''}" onclick="goPage(${i})">${i}</button>`;
+            }
+
+            html += `<button class="page-btn" onclick="goPage(${current + 1})" ${current === total ? 'disabled' : ''}>
+                <i class="fas fa-chevron-right" style="font-size:0.6rem"></i>
+            </button>`;
+
+            container.innerHTML = html;
+        }
+
+        function goPage(page) { currentPage = page; renderizarTabla(); }
+
+        // ── EDITAR ──
+        function editarPaquete(paqueteId) {
+            const p = todosPaquetes.find(x => x.id === paqueteId);
+            if (!p) { alert('Paquete no encontrado'); return; }
+
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-title">
+                        <div class="m-icon"><i class="fas fa-box-open"></i></div>
+                        Editar Paquete
+                    </div>
+                    <div class="modal-field">
+                        <label>Nombre</label>
+                        <input type="text" id="editNombre" value="${escapeHTML(p.nombre || '')}">
+                    </div>
+                    <div class="modal-field">
+                        <label>Tipo de Evento</label>
+                        <input type="text" id="editTipoEvento" value="${escapeHTML(p.tipoEvento || p.tipo_evento || '')}">
+                    </div>
+                    <div class="modal-field">
+                        <label>Precio Base (COP)</label>
+                        <input type="number" id="editPrecioBase" value="${p.precioBase || p.precio_base || 0}" step="100000">
+                    </div>
+                    <div class="modal-field">
+                        <label>Descuento (%)</label>
+                        <input type="number" id="editDescuento" value="${p.descuentoPct || p.descuento || 0}" step="1" min="0" max="100">
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn-modal-cancel" onclick="this.closest('.modal').remove()">Cancelar</button>
+                        <button class="btn-modal-save" onclick="guardarPaquete(${paqueteId})">Guardar cambios</button>
+                    </div>
+                </div>`;
+            modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
+            document.body.appendChild(modal);
+        }
+
+        // ── GUARDAR ──
+        async function guardarPaquete(paqueteId) {
+            const nuevoNombre    = document.getElementById('editNombre').value;
+            const nuevoTipo      = document.getElementById('editTipoEvento').value;
+            const nuevoPrecio    = parseFloat(document.getElementById('editPrecioBase').value);
+            const nuevoDescuento = parseFloat(document.getElementById('editDescuento').value);
+
+            document.querySelector('.modal')?.remove();
+
+            const index = todosPaquetes.findIndex(p => p.id === paqueteId);
+            if (index !== -1) {
+                todosPaquetes[index] = {
+                    ...todosPaquetes[index],
+                    nombre: nuevoNombre,
+                    tipoEvento: nuevoTipo,
+                    precioBase: nuevoPrecio,
+                    descuentoPct: nuevoDescuento
+                };
+                actualizarEstadisticas();
+                renderizarTabla();
+            }
+        }
+
+        // ── ELIMINAR ──
+        function eliminarPaquete(paqueteId) {
+            if (!confirm('¿Eliminar este paquete? Esta acción no se puede deshacer.')) return;
+            todosPaquetes = todosPaquetes.filter(p => p.id !== paqueteId);
+            actualizarEstadisticas();
+            renderizarTabla();
+        }
+
+        // ── NUEVO ──
+        function abrirNuevoPaquete() {
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-title">
+                        <div class="m-icon"><i class="fas fa-plus"></i></div>
+                        Nuevo Paquete
+                    </div>
+                    <div class="modal-field"><label>Nombre</label><input type="text" id="newNombre" placeholder="Nombre del paquete"></div>
+                    <div class="modal-field"><label>Tipo de Evento</label><input type="text" id="newTipo" placeholder="Boda, Cumpleaños, Grado..."></div>
+                    <div class="modal-field"><label>Precio Base (COP)</label><input type="number" id="newPrecio" value="0" step="100000"></div>
+                    <div class="modal-field"><label>Descuento (%)</label><input type="number" id="newDescuento" value="0" step="1" min="0" max="100"></div>
+                    <div class="modal-footer">
+                        <button class="btn-modal-cancel" onclick="this.closest('.modal').remove()">Cancelar</button>
+                        <button class="btn-modal-save" onclick="crearPaquete()">Crear Paquete</button>
+                    </div>
+                </div>`;
+            modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
+            document.body.appendChild(modal);
+        }
+
+        function crearPaquete() {
+            const nombre    = document.getElementById('newNombre').value.trim();
+            const tipo      = document.getElementById('newTipo').value.trim();
+            const precio    = parseFloat(document.getElementById('newPrecio').value);
+            const descuento = parseFloat(document.getElementById('newDescuento').value);
+
+            if (!nombre) { alert('El nombre es requerido.'); return; }
+
+            const newId = (Math.max(...todosPaquetes.map(p => p.id), 0)) + 1;
+            todosPaquetes.push({ id: newId, nombre, tipoEvento: tipo, precioBase: precio, descuentoPct: descuento });
+            document.querySelector('.modal')?.remove();
+            actualizarEstadisticas();
+            renderizarTabla();
+        }
+
+        function escapeHTML(str) {
+            if (!str) return '';
+            return String(str).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+        }
+
+        function verificarAccesoAdmin() {
+            if (typeof usuarioActual === 'undefined' || !usuarioActual || usuarioActual.rol !== 'admin') {
+                alert('⛔ Acceso denegado. Solo administradores.');
+                window.location.href = '/index.html';
+                return false;
+            }
+            return true;
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (verificarAccesoAdmin()) {
+                actualizarNavbarAdmin();
+                cargarPaquetes();
+            }
+        });
+
+        window.filtrarPaquetes   = filtrarPaquetes;
+        window.filterByTipo      = filterByTipo;
+        window.editarPaquete     = editarPaquete;
+        window.guardarPaquete    = guardarPaquete;
+        window.eliminarPaquete   = eliminarPaquete;
+        window.abrirNuevoPaquete = abrirNuevoPaquete;
+        window.crearPaquete      = crearPaquete;
+        window.goPage            = goPage;
+    </script>
+</body>
+</html>

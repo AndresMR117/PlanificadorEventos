@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrarse | Planificador IA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            background: #ffffff;
+        }
+
+        /* Sección izquierda - Imagen */
+        .hero-section {
+            flex: 1.2;
+            position: relative;
+            overflow: hidden;
+            display: none;
+        }
+
+        .hero-image {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .hero-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.2) 100%);
+        }
+
+        .hero-content {
+            position: absolute;
+            bottom: 60px;
+            left: 60px;
+            right: 60px;
+            color: white;
+            z-index: 2;
+        }
+
+        .hero-content h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+            letter-spacing: -0.02em;
+        }
+
+        .hero-content p {
+            font-size: 1rem;
+            line-height: 1.5;
+            opacity: 0.9;
+            max-width: 80%;
+        }
+
+        /* Sección derecha - Formulario */
+        .form-section {
+            flex: 0.8;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 48px 64px;
+            background: white;
+        }
+
+        /* Logo móvil */
+        .mobile-logo {
+            display: none;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .mobile-logo .logo-icon {
+            width: 48px;
+            height: 48px;
+            background: #1e293b;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 12px;
+            font-size: 1.5rem;
+        }
+
+        .mobile-logo h2 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        /* Toggle de registro/login */
+        .toggle-buttons {
+            display: inline-flex;
+            background: #f1f5f9;
+            border-radius: 40px;
+            padding: 4px;
+            margin-bottom: 32px;
+        }
+
+        .toggle-btn {
+            padding: 10px 28px;
+            border: none;
+            background: transparent;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #64748b;
+        }
+
+        .toggle-btn.active {
+            background: white;
+            color: #1e293b;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .toggle-btn:hover:not(.active) {
+            color: #1e293b;
+        }
+
+        /* Títulos */
+        .form-header {
+            margin-bottom: 32px;
+        }
+
+        .form-header h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 8px;
+        }
+
+        .form-header p {
+            font-size: 0.85rem;
+            color: #64748b;
+        }
+
+        /* Campos del formulario */
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #334155;
+            font-size: 0.8rem;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s ease;
+            background: #ffffff;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        /* Icono dentro del campo */
+        .input-icon {
+            position: relative;
+        }
+
+        .input-icon i:first-child {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+
+        .input-icon .input-field {
+            padding-left: 42px;
+        }
+
+        /* Mostrar/ocultar contraseña */
+        .toggle-password {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #94a3b8;
+            transition: color 0.3s ease;
+        }
+
+        .toggle-password:hover {
+            color: #3b82f6;
+        }
+
+        /* Fortaleza de contraseña */
+        .password-strength {
+            margin-top: 8px;
+        }
+
+        .strength-bar {
+            height: 3px;
+            border-radius: 2px;
+            margin-top: 5px;
+            transition: all 0.3s ease;
+            width: 0%;
+        }
+
+        .strength-text {
+            color: #64748b;
+            margin-top: 5px;
+            display: block;
+            font-size: 0.7rem;
+        }
+
+        /* Botón principal */
+        .btn-primary {
+            width: 100%;
+            padding: 12px;
+            background: #1e293b;
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 8px;
+            margin-bottom: 24px;
+        }
+
+        .btn-primary:hover {
+            background: #0f172a;
+            transform: translateY(-1px);
+        }
+
+        /* Separador */
+        .separator {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 24px 0;
+            color: #94a3b8;
+            font-size: 0.7rem;
+        }
+
+        .separator::before,
+        .separator::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .separator span {
+            margin: 0 15px;
+        }
+
+        /* Botones sociales */
+        .social-buttons {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 32px;
+        }
+
+        .btn-social {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            background: white;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 0.8rem;
+            color: #334155;
+        }
+
+        .btn-social i {
+            font-size: 1rem;
+        }
+
+        .btn-social.google i {
+            color: #DB4437;
+        }
+
+        .btn-social.linkedin i {
+            color: #0A66C2;
+        }
+
+        .btn-social:hover {
+            border-color: #3b82f6;
+            background: #f8fafc;
+        }
+
+        /* Términos */
+        .terms {
+            text-align: center;
+            font-size: 0.7rem;
+            color: #64748b;
+        }
+
+        .terms a {
+            color: #3b82f6;
+            text-decoration: none;
+        }
+
+        .terms a:hover {
+            text-decoration: underline;
+        }
+
+        /* Mensajes de error */
+        .error-message {
+            background: #fee2e2;
+            color: #dc2626;
+            padding: 12px 16px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Responsive */
+        @media (min-width: 1024px) {
+            .hero-section {
+                display: block;
+            }
+        }
+
+        @media (max-width: 1023px) {
+            .form-section {
+                flex: 1;
+                padding: 40px 32px;
+            }
+            .mobile-logo {
+                display: block;
+            }
+            .hero-section {
+                display: none;
+            }
+        }
+
+        @media (max-width: 550px) {
+            .form-section {
+                padding: 32px 24px;
+            }
+            .toggle-btn {
+                padding: 8px 20px;
+            }
+            .form-header h3 {
+                font-size: 1.3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sección izquierda - Imagen -->
+    <section class="hero-section">
+        <img 
+            class="hero-image" 
+            src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&q=80&w=2069" 
+            alt="Evento de gala"
+        >
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <h1>Planificador IA</h1>
+            <p>Gestión inteligente de eventos para celebraciones inolvidables. Experimente la eficiencia de la planificación con IA.</p>
+        </div>
+    </section>
+
+    <!-- Sección derecha - Formulario -->
+    <main class="form-section">
+        <!-- Logo móvil -->
+        <div class="mobile-logo">
+            <div class="logo-icon">🎉</div>
+            <h2>Planificador IA</h2>
+        </div>
+
+        <!-- Toggle Registro / Login -->
+        <div class="toggle-buttons">
+            <button class="toggle-btn active">Registrarse</button>
+            <button class="toggle-btn" onclick="window.location.href='/pages/login.html'">Iniciar Sesión</button>
+        </div>
+
+        <div class="form-header">
+            <h3>Crear una cuenta</h3>
+            <p>Comience su viaje con la inteligencia Planificador IA</p>
+        </div>
+
+        <!-- Mensaje de error -->
+        <div id="errorMessage" class="error-message" style="display: none;">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span id="errorText">Error en el registro</span>
+        </div>
+
+        <!-- Formulario de registro -->
+        <form id="registerForm">
+            <div class="input-group">
+                <label>Nombre completo</label>
+                <div class="input-icon">
+                    <i class="fas fa-user"></i>
+                    <input type="text" id="nombre" class="input-field" placeholder="Alex Sterling" required>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>Correo Electrónico</label>
+                <div class="input-icon">
+                    <i class="fas fa-envelope"></i>
+                    <input type="email" id="email" class="input-field" placeholder="alex@gmail.com" required>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>Contraseña</label>
+                <div class="input-icon">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="password" class="input-field" placeholder="Mínimo 8 caracteres" required>
+                    <i class="fas fa-eye toggle-password" onclick="togglePassword()"></i>
+                </div>
+                <div class="password-strength" id="passwordStrength">
+                    <div class="strength-bar" id="strengthBar"></div>
+                    <span class="strength-text" id="strengthText"></span>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-primary" id="registerBtn">
+                <i class="fas fa-user-plus"></i> Crear Cuenta
+            </button>
+        </form>
+
+        <div class="separator"></div>
+
+        <div class="terms">
+            Al registrarse, usted acepta nuestros <a href="#">Términos de Servicio</a> y <a href="#">Política de Privacidad</a>.
+        </div>
+    </main>
+
+    <script src="/js/api.js"></script>
+    <script>
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const icon = document.querySelector('.toggle-password');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+        
+        function checkPasswordStrength(password) {
+            const strengthBar = document.getElementById('strengthBar');
+            const strengthText = document.getElementById('strengthText');
+            
+            let strength = 0;
+            let message = '';
+            let color = '';
+            
+            if (password.length >= 8) strength++;
+            if (password.match(/[a-z]+/)) strength++;
+            if (password.match(/[A-Z]+/)) strength++;
+            if (password.match(/[0-9]+/)) strength++;
+            if (password.match(/[$@#&!]+/)) strength++;
+            
+            switch (strength) {
+                case 0:
+                case 1:
+                    message = 'Débil';
+                    color = '#dc2626';
+                    break;
+                case 2:
+                    message = 'Regular';
+                    color = '#f59e0b';
+                    break;
+                case 3:
+                    message = 'Buena';
+                    color = '#10b981';
+                    break;
+                case 4:
+                case 5:
+                    message = 'Fuerte';
+                    color = '#059669';
+                    break;
+            }
+            
+            const width = (strength / 5) * 100;
+            strengthBar.style.width = width + '%';
+            strengthBar.style.background = color;
+            strengthText.textContent = message;
+            strengthText.style.color = color;
+        }
+        
+        document.getElementById('password').addEventListener('input', (e) => {
+            checkPasswordStrength(e.target.value);
+        });
+        
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            const errorText = document.getElementById('errorText');
+            errorText.textContent = message;
+            errorDiv.style.display = 'flex';
+            
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+            }, 4000);
+        }
+        
+        function isValidEmail(email) {
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        }
+        
+        async function realizarRegistro(nombre, email, password) {
+            const registerBtn = document.getElementById('registerBtn');
+            
+            try {
+                await apiRequest('/registro/', 'POST', { nombre, email, password });
+                window.location.href = '/pages/login.html';
+            } catch (error) {
+                registerBtn.disabled = false;
+                registerBtn.innerHTML = '<i class="fas fa-user-plus"></i> Crear Cuenta';
+                showError(error.message || 'Error al registrar usuario');
+            }
+        }
+        
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const nombre = document.getElementById('nombre').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const registerBtn = document.getElementById('registerBtn');
+            
+            if (!nombre || !email || !password) {
+                showError('Por favor completa todos los campos');
+                return;
+            }
+            
+            if (nombre.length < 3) {
+                showError('El nombre debe tener al menos 3 caracteres');
+                return;
+            }
+            
+            if (!isValidEmail(email)) {
+                showError('Por favor ingresa un correo electrónico válido');
+                return;
+            }
+            
+            if (password.length < 8) {
+                showError('La contraseña debe tener al menos 8 caracteres');
+                return;
+            }
+            
+            registerBtn.disabled = true;
+            registerBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Registrando...';
+            
+            await realizarRegistro(nombre, email, password);
+        });
+        
+        function socialRegister(provider) {
+            alert(`Funcionalidad de ${provider} en desarrollo`);
+        }
+        
+        window.togglePassword = togglePassword;
+        window.socialRegister = socialRegister;
+    </script>
+</body>
+</html>

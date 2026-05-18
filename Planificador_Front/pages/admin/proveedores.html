@@ -1,0 +1,1133 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flow Events</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/styles.css">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --green: #2ECC71;
+            --green-dark: #1a9e52;
+            --green-deep: #0f7a3a;
+            --green-light: #d4f5e2;
+            --green-muted: rgba(46,204,113,0.12);
+            --bg: #f7f8f6;
+            --text: #1a1a2e;
+            --muted: #6b7280;
+            --border: #e5e7eb;
+            --radius: 16px;
+            --red: #ef4444;
+            --yellow: #f59e0b;
+            --blue: #2563eb;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        /* ── NAVBAR ── */
+        .navbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 40px;
+            height: 60px;
+            background: rgba(247,248,246,0.95);
+            backdrop-filter: blur(12px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: var(--green);
+            cursor: pointer;
+        }
+
+        .nav-brand .brand-icon {
+            width: 26px;
+            height: 26px;
+            background: var(--green);
+            border-radius: 7px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.78rem;
+            color: white;
+        }
+
+        .nav-center { display: flex; gap: 4px; }
+
+        .nav-center button {
+            background: none;
+            border: none;
+            padding: 7px 14px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--muted);
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .nav-center button:hover { color: var(--text); }
+
+        .nav-center button.active {
+            color: var(--text);
+            font-weight: 600;
+        }
+
+        .nav-center button.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 2px;
+            background: var(--green);
+            border-radius: 2px;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--green-light);
+            overflow: hidden;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid rgba(46,204,113,0.3);
+        }
+
+        .avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .avatar i { font-size: 0.8rem; color: var(--green-dark); }
+
+        /* ── PAGE WRAP ── */
+        .page-wrap {
+            max-width: 1160px;
+            margin: 0 auto;
+            padding: 36px 40px 80px;
+        }
+
+        /* ── BREADCRUMB + TITLE ── */
+        .page-eyebrow {
+            font-size: 0.72rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 6px;
+        }
+
+        .page-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 28px;
+        }
+
+        /* ── STAT CARDS ── */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1.6fr 1fr 1fr;
+            gap: 18px;
+            margin-bottom: 28px;
+        }
+
+        /* Big green card */
+        .stat-card-hero {
+            background: linear-gradient(135deg, var(--green) 0%, var(--green-deep) 100%);
+            border-radius: var(--radius);
+            padding: 28px 28px 24px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.25s;
+        }
+
+        .stat-card-hero:hover { transform: translateY(-3px); }
+
+        .stat-card-hero .sc-icon {
+            width: 38px;
+            height: 38px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            margin-bottom: 16px;
+        }
+
+        /* Background decoration circles */
+        .stat-card-hero::before {
+            content: '';
+            position: absolute;
+            right: -20px;
+            top: 10px;
+            width: 110px;
+            height: 110px;
+            border: 22px solid rgba(255,255,255,0.08);
+            border-radius: 50%;
+        }
+
+        .stat-card-hero::after {
+            content: '';
+            position: absolute;
+            right: 30px;
+            top: -20px;
+            width: 70px;
+            height: 70px;
+            border: 16px solid rgba(255,255,255,0.06);
+            border-radius: 50%;
+        }
+
+        .stat-hero-val {
+            font-size: 3rem;
+            font-weight: 700;
+            line-height: 1;
+            margin-bottom: 8px;
+        }
+
+        .stat-hero-label {
+            font-size: 0.8rem;
+            opacity: 0.85;
+        }
+
+        /* Small stat cards */
+        .stat-card-sm {
+            background: white;
+            border-radius: var(--radius);
+            padding: 24px;
+            border: 1px solid var(--border);
+            position: relative;
+            transition: transform 0.25s, box-shadow 0.25s;
+        }
+
+        .stat-card-sm:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.07);
+        }
+
+        .sc-sm-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .sc-sm-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.95rem;
+        }
+
+        .sc-sm-icon.blue { background: rgba(37,99,235,0.1); color: var(--blue); }
+        .sc-sm-icon.pink { background: rgba(239,68,68,0.1); color: var(--red); }
+
+        .sc-sm-badge {
+            font-size: 0.68rem;
+            font-weight: 700;
+            color: var(--green-dark);
+            background: var(--green-light);
+            padding: 3px 8px;
+            border-radius: 20px;
+        }
+
+        .sc-sm-val {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text);
+            line-height: 1;
+            margin-bottom: 6px;
+        }
+
+        .sc-sm-label {
+            font-size: 0.8rem;
+            color: var(--muted);
+        }
+
+        /* ── TOOLBAR ── */
+        .toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        .search-wrap {
+            position: relative;
+            flex: 1;
+            max-width: 340px;
+        }
+
+        .search-wrap i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--muted);
+            font-size: 0.8rem;
+        }
+
+        .search-wrap input {
+            width: 100%;
+            padding: 10px 14px 10px 36px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.875rem;
+            color: var(--text);
+            background: white;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .search-wrap input::placeholder { color: var(--muted); }
+        .search-wrap input:focus {
+            border-color: var(--green);
+            box-shadow: 0 0 0 3px var(--green-muted);
+        }
+
+        .toolbar-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-filtrar {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            padding: 10px 18px;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--muted);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-filtrar:hover { border-color: var(--green); color: var(--green); }
+
+        .btn-nuevo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--green);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .btn-nuevo:hover { background: var(--green-dark); }
+
+        /* ── TABLE ── */
+        .table-section {
+            background: white;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            overflow: hidden;
+        }
+
+        .table-overflow { overflow-x: auto; }
+
+        .admin-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 780px;
+        }
+
+        .admin-table thead th {
+            padding: 12px 20px;
+            text-align: left;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--muted);
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            background: var(--bg);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .admin-table tbody tr {
+            border-bottom: 1px solid var(--border);
+            transition: background 0.15s;
+        }
+
+        .admin-table tbody tr:last-child { border-bottom: none; }
+        .admin-table tbody tr:hover { background: #fafffe; }
+
+        .admin-table td {
+            padding: 15px 20px;
+            font-size: 0.875rem;
+            color: var(--text);
+            vertical-align: middle;
+        }
+
+        .td-id {
+            color: var(--muted);
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        /* Provider name cell */
+        .td-proveedor {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .prov-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+
+        .prov-icon.cat-catering     { background: rgba(249,115,22,0.12); color: #ea580c; }
+        .prov-icon.cat-foto         { background: rgba(99,102,241,0.12); color: #4f46e5; }
+        .prov-icon.cat-musica       { background: rgba(236,72,153,0.12); color: #db2777; }
+        .prov-icon.cat-iluminacion  { background: rgba(234,179,8,0.12);  color: #ca8a04; }
+        .prov-icon.cat-floral       { background: rgba(34,197,94,0.12);  color: #16a34a; }
+        .prov-icon.cat-default      { background: rgba(107,114,128,0.12); color: #6b7280; }
+
+        .prov-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        /* Category pill */
+        .cat-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.72rem;
+            font-weight: 600;
+        }
+
+        .cat-badge.cat-catering    { background: rgba(249,115,22,0.1);  color: #ea580c; }
+        .cat-badge.cat-foto        { background: rgba(99,102,241,0.1);  color: #4f46e5; }
+        .cat-badge.cat-musica      { background: rgba(236,72,153,0.1);  color: #db2777; }
+        .cat-badge.cat-iluminacion { background: rgba(234,179,8,0.1);   color: #ca8a04; }
+        .cat-badge.cat-floral      { background: rgba(34,197,94,0.1);   color: #16a34a; }
+        .cat-badge.cat-default     { background: rgba(107,114,128,0.1); color: #6b7280; }
+
+        /* Rating */
+        .td-rating {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        .td-rating i { color: var(--yellow); font-size: 0.8rem; }
+
+        /* Action icons */
+        .action-icons {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            justify-content: flex-end;
+        }
+
+        .icon-btn {
+            width: 30px;
+            height: 30px;
+            border-radius: 7px;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.78rem;
+            transition: all 0.2s;
+            background: none;
+        }
+
+        .icon-btn-view { color: var(--green); }
+        .icon-btn-view:hover { background: var(--green-muted); }
+
+        .icon-btn-edit { color: var(--muted); }
+        .icon-btn-edit:hover { background: rgba(107,114,128,0.1); color: var(--text); }
+
+        .icon-btn-del { color: var(--muted); }
+        .icon-btn-del:hover { background: rgba(239,68,68,0.1); color: var(--red); }
+
+        /* ── TABLE FOOTER + PAGINATION ── */
+        .table-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 20px;
+            border-top: 1px solid var(--border);
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .table-count {
+            font-size: 0.8rem;
+            color: var(--muted);
+        }
+
+        .pagination {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .page-btn {
+            width: 30px;
+            height: 30px;
+            border-radius: 7px;
+            border: 1px solid var(--border);
+            background: white;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--text);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .page-btn:hover { border-color: var(--green); color: var(--green); }
+        .page-btn.active { background: var(--green); border-color: var(--green); color: white; }
+        .page-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+        .page-ellipsis { padding: 0 4px; color: var(--muted); font-size: 0.8rem; }
+
+        /* ── EMPTY / LOADING ── */
+        .table-empty {
+            text-align: center;
+            padding: 50px 20px;
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+
+        /* ── MODAL ── */
+        .modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(6px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 28px;
+            max-width: 460px;
+            width: 100%;
+            animation: modalIn 0.22s ease;
+        }
+
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.96) translateY(10px); }
+            to   { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .modal-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            font-size: 1rem;
+            color: var(--text);
+            margin-bottom: 22px;
+        }
+
+        .modal-title .m-icon {
+            width: 34px;
+            height: 34px;
+            background: var(--green-muted);
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--green-dark);
+            font-size: 0.9rem;
+        }
+
+        .modal-field {
+            margin-bottom: 14px;
+        }
+
+        .modal-field label {
+            display: block;
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+
+        .modal-field input {
+            width: 100%;
+            padding: 10px 13px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.875rem;
+            color: var(--text);
+            background: white;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .modal-field input:focus { border-color: var(--green); }
+
+        .modal-footer {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+            padding-top: 18px;
+            border-top: 1px solid var(--border);
+        }
+
+        .btn-modal-cancel {
+            padding: 10px 20px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--muted);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-modal-cancel:hover { border-color: var(--text); color: var(--text); }
+
+        .btn-modal-save {
+            padding: 10px 22px;
+            background: var(--green);
+            border: none;
+            border-radius: 10px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: white;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-modal-save:hover { background: var(--green-dark); }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 900px) {
+            .page-wrap { padding: 28px 20px 60px; }
+            .navbar { padding: 0 20px; }
+            .nav-center { display: none; }
+            .stats-grid { grid-template-columns: 1fr 1fr; }
+            .stat-card-hero { grid-column: 1 / -1; }
+        }
+
+        @media (max-width: 560px) {
+            .stats-grid { grid-template-columns: 1fr; }
+            .toolbar { flex-direction: column; align-items: stretch; }
+            .search-wrap { max-width: 100%; }
+            .toolbar-right { justify-content: flex-end; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ── NAVBAR ── -->
+    <nav class="navbar">
+        <div class="nav-brand" onclick="window.location.href='/index.html'">
+            <div class="brand-icon">✦</div>
+           Flow Events
+        </div>
+        <div class="nav-center" id="navCenter"></div>
+        <div class="nav-right" id="auth-buttons">
+            <div class="avatar"><i class="fas fa-user"></i></div>
+        </div>
+    </nav>
+
+    <div class="page-wrap">
+
+        <!-- ── HEADER ── -->
+        <div class="page-eyebrow">Panel de Control</div>
+        <div class="page-title">Gestión de Proveedores</div>
+
+        <!-- ── STATS ── -->
+        <div class="stats-grid">
+            <!-- Hero card -->
+            <div class="stat-card-hero">
+                <div class="sc-icon"><i class="fas fa-store"></i></div>
+                <div class="stat-hero-val" id="totalProveedores">0</div>
+                <div class="stat-hero-label">Total de Proveedores Activos</div>
+            </div>
+            <!-- Rating -->
+            <div class="stat-card-sm">
+                <div class="sc-sm-header">
+                    <div class="sc-sm-icon blue"><i class="fas fa-star"></i></div>
+                    <span class="sc-sm-badge" id="ratingBadge">+12% este mes</span>
+                </div>
+                <div class="sc-sm-val" id="promedioCalificacion">0.0</div>
+                <div class="sc-sm-label">Calificación Promedio</div>
+            </div>
+            <!-- Cities -->
+            <div class="stat-card-sm">
+                <div class="sc-sm-header">
+                    <div class="sc-sm-icon pink"><i class="fas fa-map-marker-alt"></i></div>
+                </div>
+                <div class="sc-sm-val" id="ciudadesUnicas">0</div>
+                <div class="sc-sm-label">Ciudades con Proveedores</div>
+            </div>
+        </div>
+
+        <!-- ── TOOLBAR ── -->
+        <div class="toolbar">
+            <div class="search-wrap">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="Buscar por nombre o ID"
+                       oninput="filtrarProveedores()" onkeyup="filtrarProveedores()">
+            </div>
+            <div class="toolbar-right">
+                <button class="btn-filtrar"><i class="fas fa-sliders-h"></i> Filtrar</button>
+                <button class="btn-nuevo" onclick="abrirNuevoProveedor()">
+                    <i class="fas fa-plus"></i> Nuevo Proveedor
+                </button>
+            </div>
+        </div>
+
+        <!-- ── TABLE ── -->
+        <div class="table-section">
+            <div class="table-overflow">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>NOMBRE DEL PROVEEDOR</th>
+                            <th>CATEGORÍA</th>
+                            <th>CIUDAD</th>
+                            <th>TELÉFONO</th>
+                            <th>CALIFICACIÓN</th>
+                            <th style="text-align:right">ACCIONES</th>
+                        </tr>
+                    </thead>
+                    <tbody id="proveedoresTableBody">
+                        <tr><td colspan="7" class="table-empty">Cargando proveedores...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="table-footer">
+                <div class="table-count" id="tableCount">Cargando...</div>
+                <div class="pagination" id="pagination"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="/js/api.js"></script>
+    <script>
+        let todosProveedores = [];
+        let currentSearch = '';
+        let currentPage = 1;
+        const PER_PAGE = 8;
+
+        // ── Category helpers ──
+        const CAT_MAP = {
+            catering:    { key: 'cat-catering',    icon: 'fa-utensils',     label: 'Catering' },
+            fotografía:  { key: 'cat-foto',        icon: 'fa-camera',       label: 'Fotografía' },
+            foto:        { key: 'cat-foto',        icon: 'fa-camera',       label: 'Fotografía' },
+            música:      { key: 'cat-musica',      icon: 'fa-music',        label: 'Música' },
+            musica:      { key: 'cat-musica',      icon: 'fa-music',        label: 'Música' },
+            iluminación: { key: 'cat-iluminacion', icon: 'fa-lightbulb',    label: 'Iluminación' },
+            iluminacion: { key: 'cat-iluminacion', icon: 'fa-lightbulb',    label: 'Iluminación' },
+            floral:      { key: 'cat-floral',      icon: 'fa-leaf',         label: 'Floral' },
+            decoración:  { key: 'cat-floral',      icon: 'fa-leaf',         label: 'Decoración' },
+        };
+
+        function getCatInfo(proveedor) {
+            const raw = (proveedor.categoria || proveedor.tipo_servicio || '').toLowerCase();
+            for (const [key, val] of Object.entries(CAT_MAP)) {
+                if (raw.includes(key)) return val;
+            }
+            // Guess from name
+            const name = (proveedor.nombre || '').toLowerCase();
+            if (name.includes('foto') || name.includes('lente')) return CAT_MAP['foto'];
+            if (name.includes('flor') || name.includes('decor')) return CAT_MAP['floral'];
+            if (name.includes('catering') || name.includes('banquet') || name.includes('sabor')) return CAT_MAP['catering'];
+            if (name.includes('mús') || name.includes('music') || name.includes('vibe')) return CAT_MAP['música'];
+            if (name.includes('luz') || name.includes('light') || name.includes('ilum')) return CAT_MAP['iluminacion'];
+            return { key: 'cat-default', icon: 'fa-store', label: 'Servicios' };
+        }
+
+        // ── NAVBAR ──
+        function actualizarNavbarAdmin() {
+            const navCenter = document.getElementById('navCenter');
+            if (!navCenter) return;
+            const esAdmin = typeof usuarioActual !== 'undefined' && usuarioActual && usuarioActual.rol === 'admin';
+            let botones = `<button onclick="window.location.href='/index.html'">Inicio</button>`;
+            if (esAdmin) {
+                botones += `
+                    <button onclick="window.location.href='/pages/admin/usuarios.html'">Usuarios</button>
+                    <button class="active" onclick="window.location.href='/pages/admin/proveedores.html'">Proveedores</button>
+                    <button onclick="window.location.href='/pages/admin/planes.html'">Planes</button>
+                `;
+            }
+            navCenter.innerHTML = botones;
+        }
+
+        // ── CARGAR PROVEEDORES ──
+        async function cargarProveedores() {
+            try {
+                const proveedores = await apiRequest('/proveedores/');
+                todosProveedores = proveedores;
+                actualizarEstadisticas();
+                renderizarTabla();
+            } catch (error) {
+                console.error('Error al cargar proveedores:', error);
+                todosProveedores = [
+                    { id: 1, nombre: 'Lente Amazónico Fotografía', calificacion: 4.9, ciudad: 'Florencia', telefono: '3101234567', categoria: 'Fotografía' },
+                    { id: 2, nombre: 'Magia Floral del Caquetá',   calificacion: 4.9, ciudad: 'Florencia', telefono: '3102345678', categoria: 'Floral' },
+                    { id: 3, nombre: 'Sabor Caqueteño Banquetes',  calificacion: 4.8, ciudad: 'Florencia', telefono: '3103456789', categoria: 'Catering' },
+                    { id: 4, nombre: 'Flor Arcoíris Eventos',       calificacion: 4.7, ciudad: 'Florencia', telefono: '3104567890', categoria: 'Decoración' },
+                    { id: 5, nombre: 'Dulces del Amazonas',          calificacion: 4.8, ciudad: 'Florencia', telefono: '3105678901', categoria: 'Catering' },
+                ];
+                actualizarEstadisticas();
+                renderizarTabla();
+            }
+        }
+
+        // ── ESTADÍSTICAS ──
+        function actualizarEstadisticas() {
+            document.getElementById('totalProveedores').textContent = todosProveedores.length;
+
+            let suma = 0, cnt = 0;
+            todosProveedores.forEach(p => {
+                let c = parseFloat(p.calificacion || p.calificacion_promedio || p.rating || 0);
+                if (!isNaN(c) && c > 0) { suma += c; cnt++; }
+            });
+            const prom = cnt > 0 ? (suma / cnt).toFixed(1) : '0.0';
+            document.getElementById('promedioCalificacion').textContent = prom;
+
+            const ciudades = new Set(todosProveedores.map(p => p.ciudad || p.ubicacion || 'N/A')).size;
+            document.getElementById('ciudadesUnicas').textContent = ciudades;
+        }
+
+        function obtenerCalificacion(p) {
+            let c = parseFloat(p.calificacion || p.calificacion_promedio || p.rating || 0);
+            return isNaN(c) ? 0 : c;
+        }
+
+        // ── FILTRAR ──
+        function filtrarProveedores() {
+            currentSearch = document.getElementById('searchInput').value.toLowerCase();
+            currentPage = 1;
+            renderizarTabla();
+        }
+
+        // ── RENDER TABLE ──
+        function renderizarTabla() {
+            let filtrados = [...todosProveedores];
+            if (currentSearch) {
+                filtrados = filtrados.filter(p =>
+                    (p.nombre && p.nombre.toLowerCase().includes(currentSearch)) ||
+                    (p.ciudad && p.ciudad.toLowerCase().includes(currentSearch)) ||
+                    String(p.id).includes(currentSearch)
+                );
+            }
+
+            const total = filtrados.length;
+            const totalPages = Math.ceil(total / PER_PAGE) || 1;
+            const start = (currentPage - 1) * PER_PAGE;
+            const page = filtrados.slice(start, start + PER_PAGE);
+
+            document.getElementById('tableCount').textContent =
+                `Mostrando ${total === 0 ? 0 : start + 1} a ${Math.min(start + PER_PAGE, total)} de ${total} proveedores`;
+
+            const tbody = document.getElementById('proveedoresTableBody');
+
+            if (page.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="table-empty">📭 No se encontraron proveedores</td></tr>';
+                renderPagination(0, 0);
+                return;
+            }
+
+            tbody.innerHTML = page.map((p, i) => {
+                const num = String(start + i + 1).padStart(3, '0');
+                const calif = obtenerCalificacion(p);
+                const ciudad = p.ciudad || p.ubicacion || '—';
+                const telefono = p.telefono || p.contacto || '—';
+                const cat = getCatInfo(p);
+
+                return `
+                <tr>
+                    <td class="td-id">#P${num}</td>
+                    <td>
+                        <div class="td-proveedor">
+                            <div class="prov-icon ${cat.key}"><i class="fas ${cat.icon}"></i></div>
+                            <span class="prov-name">${escapeHTML(p.nombre)}</span>
+                        </div>
+                    </td>
+                    <td><span class="cat-badge ${cat.key}">${cat.label}</span></td>
+                    <td style="color:var(--muted);font-size:0.85rem">${escapeHTML(ciudad)}</td>
+                    <td style="font-size:0.85rem">${escapeHTML(telefono)}</td>
+                    <td>
+                        <div class="td-rating">
+                            <i class="fas fa-star"></i>
+                            ${calif.toFixed(1)}
+                        </div>
+                    </td>
+                    <td>
+                        <div class="action-icons">
+                            <button class="icon-btn icon-btn-view" title="Ver" onclick="editarProveedor(${p.id})">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="icon-btn icon-btn-edit" title="Editar" onclick="editarProveedor(${p.id})">
+                                <i class="fas fa-pen"></i>
+                            </button>
+                            <button class="icon-btn icon-btn-del" title="Eliminar" onclick="eliminarProveedor(${p.id})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>`;
+            }).join('');
+
+            renderPagination(currentPage, totalPages);
+        }
+
+        // ── PAGINATION ──
+        function renderPagination(current, total) {
+            const container = document.getElementById('pagination');
+            if (total <= 1) { container.innerHTML = ''; return; }
+
+            let html = `<button class="page-btn" onclick="goPage(${current - 1})" ${current === 1 ? 'disabled' : ''}>
+                <i class="fas fa-chevron-left" style="font-size:0.6rem"></i>
+            </button>`;
+
+            const pages = [];
+            if (total <= 5) {
+                for (let i = 1; i <= total; i++) pages.push(i);
+            } else {
+                pages.push(1, 2, 3);
+                if (current > 4) { html += `<span class="page-ellipsis">...</span>`; }
+                if (current > 3 && current < total - 1) pages.push(current);
+                pages.push(total - 1, total);
+            }
+
+            const unique = [...new Set(pages)].sort((a, b) => a - b);
+            unique.forEach(p => {
+                html += `<button class="page-btn ${p === current ? 'active' : ''}" onclick="goPage(${p})">${p}</button>`;
+            });
+
+            if (total > 5 && current < total - 2) {
+                html += `<span class="page-ellipsis">...</span>`;
+            }
+
+            html += `<button class="page-btn" onclick="goPage(${current + 1})" ${current === total ? 'disabled' : ''}>
+                <i class="fas fa-chevron-right" style="font-size:0.6rem"></i>
+            </button>`;
+
+            container.innerHTML = html;
+        }
+
+        function goPage(page) { currentPage = page; renderizarTabla(); }
+
+        // ── EDITAR PROVEEDOR ──
+        function editarProveedor(proveedorId) {
+            const p = todosProveedores.find(x => x.id === proveedorId);
+            if (!p) { alert('Proveedor no encontrado'); return; }
+
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-title">
+                        <div class="m-icon"><i class="fas fa-store"></i></div>
+                        Editar Proveedor
+                    </div>
+                    <div class="modal-field">
+                        <label>Nombre</label>
+                        <input type="text" id="editNombre" value="${escapeHTML(p.nombre || '')}">
+                    </div>
+                    <div class="modal-field">
+                        <label>Categoría</label>
+                        <input type="text" id="editCategoria" value="${escapeHTML(p.categoria || '')}">
+                    </div>
+                    <div class="modal-field">
+                        <label>Calificación (0–5)</label>
+                        <input type="number" id="editCalificacion" value="${obtenerCalificacion(p)}" step="0.1" min="0" max="5">
+                    </div>
+                    <div class="modal-field">
+                        <label>Ciudad</label>
+                        <input type="text" id="editCiudad" value="${escapeHTML(p.ciudad || '')}">
+                    </div>
+                    <div class="modal-field">
+                        <label>Teléfono</label>
+                        <input type="text" id="editTelefono" value="${escapeHTML(p.telefono || '')}">
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn-modal-cancel" onclick="this.closest('.modal').remove()">Cancelar</button>
+                        <button class="btn-modal-save" onclick="guardarProveedor(${proveedorId})">Guardar cambios</button>
+                    </div>
+                </div>`;
+            modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
+            document.body.appendChild(modal);
+        }
+
+        // ── GUARDAR PROVEEDOR ──
+        async function guardarProveedor(proveedorId) {
+            const nuevoNombre      = document.getElementById('editNombre').value;
+            const nuevaCategoria   = document.getElementById('editCategoria').value;
+            const nuevaCalif       = parseFloat(document.getElementById('editCalificacion').value);
+            const nuevaCiudad      = document.getElementById('editCiudad').value;
+            const nuevoTelefono    = document.getElementById('editTelefono').value;
+
+            document.querySelector('.modal')?.remove();
+
+            const index = todosProveedores.findIndex(p => p.id === proveedorId);
+            if (index !== -1) {
+                todosProveedores[index] = {
+                    ...todosProveedores[index],
+                    nombre: nuevoNombre,
+                    categoria: nuevaCategoria,
+                    calificacion: nuevaCalif,
+                    ciudad: nuevaCiudad,
+                    telefono: nuevoTelefono
+                };
+                actualizarEstadisticas();
+                renderizarTabla();
+            }
+        }
+
+        // ── ELIMINAR PROVEEDOR ──
+        async function eliminarProveedor(proveedorId) {
+            if (!confirm('¿Eliminar este proveedor? Esta acción no se puede deshacer.')) return;
+            todosProveedores = todosProveedores.filter(p => p.id !== proveedorId);
+            actualizarEstadisticas();
+            renderizarTabla();
+        }
+
+        // ── NUEVO PROVEEDOR ──
+        function abrirNuevoProveedor() {
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-title">
+                        <div class="m-icon"><i class="fas fa-plus"></i></div>
+                        Nuevo Proveedor
+                    </div>
+                    <div class="modal-field"><label>Nombre</label><input type="text" id="newNombre" placeholder="Nombre del proveedor"></div>
+                    <div class="modal-field"><label>Categoría</label><input type="text" id="newCategoria" placeholder="ej. Catering, Fotografía..."></div>
+                    <div class="modal-field"><label>Calificación</label><input type="number" id="newCalif" value="5.0" step="0.1" min="0" max="5"></div>
+                    <div class="modal-field"><label>Ciudad</label><input type="text" id="newCiudad" placeholder="Ciudad"></div>
+                    <div class="modal-field"><label>Teléfono</label><input type="text" id="newTel" placeholder="Teléfono"></div>
+                    <div class="modal-footer">
+                        <button class="btn-modal-cancel" onclick="this.closest('.modal').remove()">Cancelar</button>
+                        <button class="btn-modal-save" onclick="crearProveedor()">Crear Proveedor</button>
+                    </div>
+                </div>`;
+            modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
+            document.body.appendChild(modal);
+        }
+
+        function crearProveedor() {
+            const nombre    = document.getElementById('newNombre').value.trim();
+            const categoria = document.getElementById('newCategoria').value.trim();
+            const calif     = parseFloat(document.getElementById('newCalif').value);
+            const ciudad    = document.getElementById('newCiudad').value.trim();
+            const telefono  = document.getElementById('newTel').value.trim();
+
+            if (!nombre) { alert('El nombre es requerido.'); return; }
+
+            const newId = (Math.max(...todosProveedores.map(p => p.id), 0)) + 1;
+            todosProveedores.push({ id: newId, nombre, categoria, calificacion: calif, ciudad, telefono });
+            document.querySelector('.modal')?.remove();
+            actualizarEstadisticas();
+            renderizarTabla();
+        }
+
+        function escapeHTML(str) {
+            if (!str) return '';
+            return String(str).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+        }
+
+        function verificarAccesoAdmin() {
+            if (typeof usuarioActual === 'undefined' || !usuarioActual || usuarioActual.rol !== 'admin') {
+                alert('⛔ Acceso denegado. Solo administradores.');
+                window.location.href = '/index.html';
+                return false;
+            }
+            return true;
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (verificarAccesoAdmin()) {
+                actualizarNavbarAdmin();
+                cargarProveedores();
+            }
+        });
+
+        window.filtrarProveedores = filtrarProveedores;
+        window.editarProveedor    = editarProveedor;
+        window.guardarProveedor   = guardarProveedor;
+        window.eliminarProveedor  = eliminarProveedor;
+        window.abrirNuevoProveedor = abrirNuevoProveedor;
+        window.crearProveedor     = crearProveedor;
+        window.goPage             = goPage;
+    </script>
+</body>
+</html>
