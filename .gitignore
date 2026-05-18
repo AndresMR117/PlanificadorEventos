@@ -1,0 +1,5 @@
+Planificador_Back/.env
+.vs/
+bin/
+obj/
+node_modules/

@@ -1,0 +1,269 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix ev: <http://eventos.caqueta.co/ontologia#> .
+
+ev: a owl:Ontology ;
+    rdfs:label "Ontología de Eventos Sociales del Caquetá"@es .
+
+# ============================================================
+# CLASES PRINCIPALES
+# ============================================================
+
+ev:TipoEvento a owl:Class .           # Boda, Cumpleaños, Grado, etc.
+ev:CategoriaServicio a owl:Class .    # Catering, Música, Fotografía, etc.
+ev:Empresa a owl:Class .              # Proveedores
+ev:Servicio a owl:Class .             # Servicios específicos
+ev:Accesorio a owl:Class .            # Elementos adicionales
+ev:Paquete a owl:Class .              # Paquetes combinados
+ev:Ubicacion a owl:Class .            # Ciudades
+ev:FactorDistancia a owl:Class .      # Factores por distancia
+ev:Temporada a owl:Class .            # Temporadas del año
+
+# ============================================================
+# PROPIEDADES
+# ============================================================
+
+ev:nombre a owl:DatatypeProperty .
+ev:descripcion a owl:DatatypeProperty .
+ev:precioBase a owl:DatatypeProperty .
+ev:precioMinimo a owl:DatatypeProperty .
+ev:precioMaximo a owl:DatatypeProperty .
+ev:precioPorPersona a owl:DatatypeProperty .
+ev:calificacion a owl:DatatypeProperty .
+ev:totalResenas a owl:DatatypeProperty .
+ev:aniosExperiencia a owl:DatatypeProperty .
+ev:ciudad a owl:DatatypeProperty .
+ev:telefono a owl:DatatypeProperty .
+ev:whatsapp a owl:DatatypeProperty .
+ev:email a owl:DatatypeProperty .
+ev:instagram a owl:DatatypeProperty .
+ev:facebook a owl:DatatypeProperty .
+ev:capacidadPersonas a owl:DatatypeProperty .
+ev:duracionHoras a owl:DatatypeProperty .
+ev:multiplicador a owl:DatatypeProperty .
+ev:distanciaKm a owl:DatatypeProperty .
+ev:factorTemporada a owl:DatatypeProperty .
+ev:rangoPrecio a owl:DatatypeProperty .
+
+ev:tieneCategoria a owl:ObjectProperty .
+ev:ofrecidoPor a owl:ObjectProperty .
+ev:ubicadaEn a owl:ObjectProperty .
+ev:compatibleConTipo a owl:ObjectProperty .
+ev:empresaAlternativa a owl:ObjectProperty .
+ev:aplicaEnTemporada a owl:ObjectProperty .
+ev:incluyeServicio a owl:ObjectProperty .
+ev:paqueteParaTipo a owl:ObjectProperty .
+ev:accesorioParaTipo a owl:ObjectProperty .
+
+# ============================================================
+# TIPOS DE EVENTO (12 tipos)
+# ============================================================
+
+ev:Boda a ev:TipoEvento ; ev:nombre "Boda"@es ; ev:descripcion "Ceremonia y celebración matrimonial."@es .
+ev:Cumpleanos a ev:TipoEvento ; ev:nombre "Cumpleaños"@es ; ev:descripcion "Celebración de aniversario de nacimiento."@es .
+ev:Grado a ev:TipoEvento ; ev:nombre "Grado"@es ; ev:descripcion "Celebración de graduación académica."@es .
+ev:QuinceAnos a ev:TipoEvento ; ev:nombre "Quinceañera"@es ; ev:descripcion "Celebración de los 15 años."@es .
+ev:BabyShower a ev:TipoEvento ; ev:nombre "Baby Shower"@es ; ev:descripcion "Fiesta de bienvenida al bebé."@es .
+ev:FiestaInfantil a ev:TipoEvento ; ev:nombre "Fiesta Infantil"@es ; ev:descripcion "Celebración temática para niños."@es .
+ev:Despedida a ev:TipoEvento ; ev:nombre "Despedida de Soltero"@es ; ev:descripcion "Fiesta previa al matrimonio."@es .
+ev:Aniversario a ev:TipoEvento ; ev:nombre "Aniversario"@es ; ev:descripcion "Celebración de aniversario de pareja."@es .
+ev:Bautizo a ev:TipoEvento ; ev:nombre "Bautizo"@es ; ev:descripcion "Ceremonia religiosa de bautismo."@es .
+ev:PrimeraComunion a ev:TipoEvento ; ev:nombre "Primera Comunión"@es ; ev:descripcion "Celebración religiosa de primera comunión."@es .
+ev:EventoCorporativo a ev:TipoEvento ; ev:nombre "Evento Corporativo"@es ; ev:descripcion "Eventos de empresas y negocios."@es .
+ev:Conferencia a ev:TipoEvento ; ev:nombre "Conferencia"@es ; ev:descripcion "Evento académico o profesional."@es .
+
+# ============================================================
+# CATEGORÍAS DE SERVICIO (16 categorías)
+# ============================================================
+
+ev:CatDecoracion a ev:CategoriaServicio ; ev:nombre "Decoración"@es .
+ev:CatCatering a ev:CategoriaServicio ; ev:nombre "Catering"@es .
+ev:CatMusica a ev:CategoriaServicio ; ev:nombre "Música y Entretenimiento"@es .
+ev:CatFotografia a ev:CategoriaServicio ; ev:nombre "Fotografía y Video"@es .
+ev:CatLogistica a ev:CategoriaServicio ; ev:nombre "Logística"@es .
+ev:CatTransporte a ev:CategoriaServicio ; ev:nombre "Transporte"@es .
+ev:CatSalon a ev:CategoriaServicio ; ev:nombre "Salón y Espacio"@es .
+ev:CatPasteleria a ev:CategoriaServicio ; ev:nombre "Pastelería"@es .
+ev:CatIluminacion a ev:CategoriaServicio ; ev:nombre "Iluminación"@es .
+ev:CatAnimacion a ev:CategoriaServicio ; ev:nombre "Animación"@es .
+ev:CatInvitaciones a ev:CategoriaServicio ; ev:nombre "Invitaciones"@es .
+ev:CatVestimenta a ev:CategoriaServicio ; ev:nombre "Vestimenta"@es .
+ev:CatFlores a ev:CategoriaServicio ; ev:nombre "Arreglos Florales"@es .
+ev:CatSeguridad a ev:CategoriaServicio ; ev:nombre "Seguridad"@es .
+ev:CatSonido a ev:CategoriaServicio ; ev:nombre "Sonido"@es .
+ev:CatAlquileres a ev:CategoriaServicio ; ev:nombre "Alquileres"@es .
+
+# ============================================================
+# UBICACIONES (12 ciudades del Caquetá)
+# ============================================================
+
+ev:UbicFlorencia a ev:Ubicacion ; ev:ciudad "Florencia"@es ; ev:distanciaKm "0"^^xsd:decimal .
+ev:UbicSanVicente a ev:Ubicacion ; ev:ciudad "San Vicente del Caguán"@es ; ev:distanciaKm "180"^^xsd:decimal .
+ev:UbicBelen a ev:Ubicacion ; ev:ciudad "Belén de los Andaquíes"@es ; ev:distanciaKm "55"^^xsd:decimal .
+ev:UbicMilan a ev:Ubicacion ; ev:ciudad "Milán"@es ; ev:distanciaKm "90"^^xsd:decimal .
+ev:UbicCartagenaChair a ev:Ubicacion ; ev:ciudad "Cartagena del Chairá"@es ; ev:distanciaKm "150"^^xsd:decimal .
+ev:UbicAlbania a ev:Ubicacion ; ev:ciudad "Albania"@es ; ev:distanciaKm "70"^^xsd:decimal .
+ev:UbicMontanita a ev:Ubicacion ; ev:ciudad "La Montañita"@es ; ev:distanciaKm "40"^^xsd:decimal .
+ev:UbicMorelia a ev:Ubicacion ; ev:ciudad "Morelia"@es ; ev:distanciaKm "75"^^xsd:decimal .
+ev:UbicValparaiso a ev:Ubicacion ; ev:ciudad "Valparaíso"@es ; ev:distanciaKm "120"^^xsd:decimal .
+ev:UbicSolano a ev:Ubicacion ; ev:ciudad "Solano"@es ; ev:distanciaKm "200"^^xsd:decimal .
+ev:UbicElDoncello a ev:Ubicacion ; ev:ciudad "El Doncello"@es ; ev:distanciaKm "85"^^xsd:decimal .
+ev:UbicPuertoRico a ev:Ubicacion ; ev:ciudad "Puerto Rico"@es ; ev:distanciaKm "110"^^xsd:decimal .
+
+# ============================================================
+# FACTORES DE DISTANCIA
+# ============================================================
+
+ev:FactorLocal a ev:FactorDistancia ; ev:nombre "Local"@es ; ev:distanciaKm "20"^^xsd:decimal ; ev:multiplicador "1.0"^^xsd:decimal .
+ev:FactorCercano a ev:FactorDistancia ; ev:nombre "Cercano"@es ; ev:distanciaKm "80"^^xsd:decimal ; ev:multiplicador "1.15"^^xsd:decimal .
+ev:FactorMedio a ev:FactorDistancia ; ev:nombre "Medio"@es ; ev:distanciaKm "200"^^xsd:decimal ; ev:multiplicador "1.35"^^xsd:decimal .
+ev:FactorLejano a ev:FactorDistancia ; ev:nombre "Lejano"@es ; ev:distanciaKm "600"^^xsd:decimal ; ev:multiplicador "1.6"^^xsd:decimal .
+
+# ============================================================
+# TEMPORADAS
+# ============================================================
+
+ev:TemporadaAlta a ev:Temporada ; ev:temporadaNombre "Alta"@es ; ev:factorTemporada "1.25"^^xsd:decimal ; ev:descripcion "Diciembre, junio, julio, Semana Santa"@es .
+ev:TemporadaMedia a ev:Temporada ; ev:temporadaNombre "Media"@es ; ev:factorTemporada "1.1"^^xsd:decimal ; ev:descripcion "Marzo, agosto, septiembre, octubre"@es .
+ev:TemporadaBaja a ev:Temporada ; ev:temporadaNombre "Baja"@es ; ev:factorTemporada "1.0"^^xsd:decimal ; ev:descripcion "Enero, febrero, abril, mayo, noviembre"@es .
+
+# ============================================================
+# EMPRESAS (PROVEEDORES) - 30 empresas
+# ============================================================
+
+# --- Decoración (5 empresas) ---
+ev:EmpresaFlorArcoiris a ev:Empresa ; ev:nombre "Flor Arcoíris Eventos"@es ; ev:calificacion "4.7"^^xsd:decimal ; ev:totalResenas "24"^^xsd:integer ; ev:ciudad "Florencia"@es ; ev:telefono "3124567890" ; ev:whatsapp "3124567890" ; ev:instagram "@florarcoiris" ; ev:tieneCategoria ev:CatDecoracion .
+ev:EmpresaMagiaFloral a ev:Empresa ; ev:nombre "Magia Floral del Caquetá"@es ; ev:calificacion "4.9"^^xsd:decimal ; ev:totalResenas "37"^^xsd:integer ; ev:ciudad "Florencia"@es ; ev:telefono "3209876543" ; ev:instagram "@magiafloral" ; ev:tieneCategoria ev:CatDecoracion ; ev:empresaAlternativa ev:EmpresaFlorArcoiris .
+ev:EmpresaBosqueEncantado a ev:Empresa ; ev:nombre "Bosque Encantado Eventos"@es ; ev:calificacion "4.6"^^xsd:decimal ; ev:totalResenas "18"^^xsd:integer ; ev:ciudad "Belen"@es ; ev:telefono "3112233445" ; ev:tieneCategoria ev:CatDecoracion .
+ev:EmpresaSuenosDecor a ev:Empresa ; ev:nombre "Sueños & Decor"@es ; ev:calificacion "4.3"^^xsd:decimal ; ev:totalResenas "12"^^xsd:integer ; ev:ciudad "San Vicente del Caguán"@es ; ev:telefono "3165432109" ; ev:tieneCategoria ev:CatDecoracion .
+ev:EmpresaRusticaEventos a ev:Empresa ; ev:nombre "Rústica Eventos"@es ; ev:calificacion "4.5"^^xsd:decimal ; ev:totalResenas "15"^^xsd:integer ; ev:ciudad "Florencia"@es ; ev:telefono "3175544332" ; ev:tieneCategoria ev:CatDecoracion .
+
+# --- Catering (5 empresas) ---
+ev:EmpresaSaborCaqueteno a ev:Empresa ; ev:nombre "Sabor Caqueteño Banquetes"@es ; ev:calificacion "4.8"^^xsd:decimal ; ev:totalResenas "42"^^xsd:integer ; ev:ciudad "Florencia"@es ; ev:telefono "3133344556" ; ev:whatsapp "3133344556" ; ev:tieneCategoria ev:CatCatering .
+ev:EmpresaCocinaReal a ev:Empresa ; ev:nombre "Cocina Real Eventos"@es ; ev:calificacion "4.6"^^xsd:decimal ; ev:totalResenas "28"^^xsd:integer ; ev:ciudad "Florencia"@es ; ev:telefono "3144455667" ; ev:tieneCategoria ev:CatCatering ; ev:empresaAlternativa ev:EmpresaSaborCaqueteno .
+ev:EmpresaTradicionCaqueta a ev:Empresa ; ev:nombre "Tradición Caquetá Gastronomía"@es ; ev:calificacion "4.4"^^xsd:decimal ; ev:totalResenas "21"^^xsd:integer ; ev:ciudad "Milan"@es ; ev:telefono "3166677889" ; ev:tieneCategoria ev:CatCatering .
+ev:EmpresaDeliciasSanVicente a ev:Empresa ; ev:nombre "Delicias del Caguán"@es ; ev:calificacion "4.2"^^xsd:decimal ; ev:totalResenas "15"^^xsd:integer ; ev:ciudad "San Vicente del Caguán"@es ; ev:telefono "3155566778" ; ev:tieneCategoria ev:CatCatering .
+ev:EmpresaAsadosCaqueta a ev:Empresa ; ev:nombre "Asados del Caquetá"@es ; ev:calificacion "4.5"^^xsd:decimal ; ev:totalResenas "19"^^xsd:integer ; ev:ciudad "Florencia"@es ; ev:telefono "3189988776" ; ev:tieneCategoria ev:CatCatering .
+
+# --- Música (4 empresas) ---
+ev:EmpresaSonidoAmazonico a ev:Empresa ; ev:nombre "Sonido Amazónico DJ & Orquesta"@es ; ev:calificacion "4.7"^^xsd:decimal ; ev:totalResenas "31"^^xsd:integer ; ev:ciudad "Florencia"@es ; ev:telefono "3177788990" ; ev:instagram "@sonidoamazonico" ; ev:tieneCategoria ev:CatMusica .
+ev:EmpresaRitmosCaqueta a ev:Empresa ; ev:nombre "Ritmos Caquetá Entertainment"@es ; ev:calificacion "4.5"^^xsd:decimal ; ev:totalResenas "26"^^xsd:integer ; ev:ciudad "Florencia"@es ; ev:telefono "3188899001" ; ev:tieneCategoria ev:CatMusica .
+ev:EmpresaBandaOriente a ev:Empresa ; ev:nombre "Banda Oriente del Caguán"@es ; ev:calificacion "4.3"^^xsd:decimal ; ev:totalResenas "19"^^xsd:integer ; ev:ciudad "San Vicente del Caguán"@es ; ev:telefono "3100011223" ; ev:tieneCategoria ev:CatMusica .
+ev:EmpresaMarimondaShow a ev:Empresa ; ev:nombre "Marimonda Show Entretenimiento"@es ; ev:calificacion "4.6"^^xsd:decimal ; ev:totalResenas "23"^^xsd:integer ; ev:ciudad "Florencia"@es ; ev:telefono "3011122334" ; ev:tieneCategoria ev:CatMusica .
+
+# --- Fotografía (4 empresas) ---
+ev:EmpresaLenteAmazonico a ev:Empresa ; ev:nombre "Lente Amazónico Fotografía"@es ; ev:calificacion "4.9"^^xsd:decimal ; ev:totalResenas "28"^^xsd:integer ; ev:ciudad "Florencia"@es ; ev:telefono "3022233445" ; ev:instagram "@lenteamazonico" ; ev:tieneCategoria ev:CatFotografia .
+ev:EmpresaRecuerdosCaqueta a ev:Empresa ; ev:nombre "Recuerdos del Caquetá"@es ; ev:calificacion "4.4"^^xsd:decimal ; ev:totalResenas "17"^^xsd:integer ; ev:ciudad "Florencia"@es ; ev:telefono "3033344556" ; ev:tieneCategoria ev:CatFotografia .
+ev:EmpresaInstanteSanVicente a ev:Empresa ; ev:nombre "Instante Fotográfico SVC"@es ; ev:calificacion "4.1"^^xsd:decimal ; ev:totalResenas "11"^^xsd:integer ; ev:ciudad "San Vicente del Caguán"@es ; ev:telefono "3044455667" ; ev:tieneCategoria ev:CatFotografia .
+ev:EmpresaFotoEventos a ev:Empresa ; ev:nombre "Foto Eventos Caquetá"@es ; ev:calificacion "4.6"^^xsd:decimal ; ev:totalResenas "22"^^xsd:integer ; ev:ciudad "Florencia"@es ; ev:telefono "3055566778" ; ev:tieneCategoria ev:CatFotografia .
+
+# --- Salones (5 empresas) ---
+ev:EmpresaSalonRealCaqueta a ev:Empresa ; ev:nombre "Salón Real Caquetá"@es ; ev:calificacion "4.7"^^xsd:decimal ; ev:totalResenas "33"^^xsd:integer ; ev:ciudad "Florencia"@es ; ev:telefono "3055566778" ; ev:capacidadPersonas "400"^^xsd:integer ; ev:tieneCategoria ev:CatSalon .
+ev:EmpresaElParaisoEventos a ev:Empresa ; ev:nombre "El Paraíso Eventos"@es ; ev:calificacion "4.8"^^xsd:decimal ; ev:totalResenas "25"^^xsd:integer ; ev:ciudad "La Montañita"@es ; ev:telefono "3066677889" ; ev:capacidadPersonas "300"^^xsd:integer ; ev:tieneCategoria ev:CatSalon .
+ev:EmpresaHaciendaCaguan a ev:Empresa ; ev:nombre "Hacienda El Caguán"@es ; ev:calificacion "4.5"^^xsd:decimal ; ev:totalResenas "22"^^xsd:integer ; ev:ciudad "San Vicente del Caguán"@es ; ev:telefono "3077788990" ; ev:capacidadPersonas "500"^^xsd:integer ; ev:tieneCategoria ev:CatSalon .
+ev:EmpresaCentroConvencion a ev:Empresa ; ev:nombre "Centro de Convenciones Florencia"@es ; ev:calificacion "4.6"^^xsd:decimal ; ev:totalResenas "27"^^xsd:integer ; ev:ciudad "Florencia"@es ; ev:telefono "3088899001" ; ev:capacidadPersonas "600"^^xsd:integer ; ev:tieneCategoria ev:CatSalon .
+ev:EmpresaSalonAndaquies a ev:Empresa ; ev:nombre "Salón Los Andaquíes"@es ; ev:calificacion "4.2"^^xsd:decimal ; ev:totalResenas "14"^^xsd:integer ; ev:ciudad "Belen"@es ; ev:telefono "3099900112" ; ev:capacidadPersonas "150"^^xsd:integer ; ev:tieneCategoria ev:CatSalon .
+
+# --- Pastelería (3 empresas) ---
+ev:EmpresaDulcesAmazonas a ev:Empresa ; ev:nombre "Dulces del Amazonas"@es ; ev:calificacion "4.8"^^xsd:decimal ; ev:totalResenas "19"^^xsd:integer ; ev:ciudad "Florencia"@es ; ev:telefono "3100011223" ; ev:instagram "@dulcesamazonas" ; ev:tieneCategoria ev:CatPasteleria .
+ev:EmpresaCreacionesDulces a ev:Empresa ; ev:nombre "Creaciones Dulces Caquetá"@es ; ev:calificacion "4.5"^^xsd:decimal ; ev:totalResenas "14"^^xsd:integer ; ev:ciudad "Florencia"@es ; ev:telefono "3111122334" ; ev:tieneCategoria ev:CatPasteleria .
+ev:EmpresaBocadosCaguan a ev:Empresa ; ev:nombre "Bocados del Caguán"@es ; ev:calificacion "4.3"^^xsd:decimal ; ev:totalResenas "11"^^xsd:integer ; ev:ciudad "San Vicente del Caguán"@es ; ev:telefono "3122233445" ; ev:tieneCategoria ev:CatPasteleria .
+
+# --- Iluminación (2 empresas) ---
+ev:EmpresaLucesAmazon a ev:Empresa ; ev:nombre "Luces Amazon"@es ; ev:calificacion "4.6"^^xsd:decimal ; ev:totalResenas "15"^^xsd:integer ; ev:ciudad "Florencia"@es ; ev:telefono "3177788990" ; ev:tieneCategoria ev:CatIluminacion .
+ev:EmpresaEfectosCaqueta a ev:Empresa ; ev:nombre "Efectos Especiales Caquetá"@es ; ev:calificacion "4.4"^^xsd:decimal ; ev:totalResenas "12"^^xsd:integer ; ev:ciudad "Florencia"@es ; ev:telefono "3188899001" ; ev:tieneCategoria ev:CatIluminacion .
+
+# --- Animación (2 empresas) ---
+ev:EmpresaMagicosKids a ev:Empresa ; ev:nombre "Mágicos Kids"@es ; ev:calificacion "4.7"^^xsd:decimal ; ev:totalResenas "18"^^xsd:integer ; ev:ciudad "Florencia"@es ; ev:telefono "3111133445" ; ev:tieneCategoria ev:CatAnimacion .
+ev:EmpresaFiestasColoridas a ev:Empresa ; ev:nombre "Fiestas Coloridas"@es ; ev:calificacion "4.5"^^xsd:decimal ; ev:totalResenas "13"^^xsd:integer ; ev:ciudad "Florencia"@es ; ev:telefono "3122244556" ; ev:tieneCategoria ev:CatAnimacion .
+
+# --- Transporte (2 empresas) ---
+ev:EmpresaTransporteEventos a ev:Empresa ; ev:nombre "Transporte Especial Caquetá"@es ; ev:calificacion "4.3"^^xsd:decimal ; ev:totalResenas "16"^^xsd:integer ; ev:ciudad "Florencia"@es ; ev:telefono "3100022233" ; ev:tieneCategoria ev:CatTransporte .
+ev:EmpresaBusEventos a ev:Empresa ; ev:nombre "Bus Eventos Caquetá"@es ; ev:calificacion "4.2"^^xsd:decimal ; ev:totalResenas "10"^^xsd:integer ; ev:ciudad "Florencia"@es ; ev:telefono "3133344556" ; ev:tieneCategoria ev:CatTransporte .
+
+# ============================================================
+# SERVICIOS (40 servicios)
+# ============================================================
+
+# --- Servicios de Decoración ---
+ev:ServDecoracionBodaBasica a ev:Servicio ; ev:nombre "Decoración Boda Básica"@es ; ev:precioBase "800000"^^xsd:decimal ; ev:precioMinimo "600000"^^xsd:decimal ; ev:precioMaximo "1200000"^^xsd:decimal ; ev:tieneCategoria ev:CatDecoracion ; ev:ofrecidoPor ev:EmpresaFlorArcoiris ; ev:compatibleConTipo ev:Boda .
+ev:ServDecoracionBodaPremium a ev:Servicio ; ev:nombre "Decoración Boda Premium"@es ; ev:precioBase "2500000"^^xsd:decimal ; ev:precioMinimo "2000000"^^xsd:decimal ; ev:precioMaximo "4000000"^^xsd:decimal ; ev:tieneCategoria ev:CatDecoracion ; ev:ofrecidoPor ev:EmpresaMagiaFloral ; ev:compatibleConTipo ev:Boda .
+ev:ServDecoracionCumpleanos a ev:Servicio ; ev:nombre "Decoración Cumpleaños"@es ; ev:precioBase "450000"^^xsd:decimal ; ev:precioMinimo "280000"^^xsd:decimal ; ev:precioMaximo "800000"^^xsd:decimal ; ev:tieneCategoria ev:CatDecoracion ; ev:ofrecidoPor ev:EmpresaFlorArcoiris ; ev:compatibleConTipo ev:Cumpleanos .
+ev:ServDecoracionQuince a ev:Servicio ; ev:nombre "Decoración Quinceañera"@es ; ev:precioBase "1200000"^^xsd:decimal ; ev:precioMinimo "900000"^^xsd:decimal ; ev:precioMaximo "1800000"^^xsd:decimal ; ev:tieneCategoria ev:CatDecoracion ; ev:ofrecidoPor ev:EmpresaMagiaFloral ; ev:compatibleConTipo ev:QuinceAnos .
+ev:ServDecoracionGrado a ev:Servicio ; ev:nombre "Decoración Grado"@es ; ev:precioBase "600000"^^xsd:decimal ; ev:precioMinimo "400000"^^xsd:decimal ; ev:precioMaximo "1000000"^^xsd:decimal ; ev:tieneCategoria ev:CatDecoracion ; ev:ofrecidoPor ev:EmpresaBosqueEncantado ; ev:compatibleConTipo ev:Grado .
+
+# --- Servicios de Catering ---
+ev:ServBanqueteBasico a ev:Servicio ; ev:nombre "Banquete Básico (por persona)"@es ; ev:precioBase "45000"^^xsd:decimal ; ev:precioMaximo "60000"^^xsd:decimal ; ev:precioPorPersona "45000"^^xsd:decimal ; ev:tieneCategoria ev:CatCatering ; ev:ofrecidoPor ev:EmpresaSaborCaqueteno ; ev:compatibleConTipo ev:Boda ; ev:compatibleConTipo ev:Cumpleanos ; ev:compatibleConTipo ev:Grado .
+ev:ServBanqueteIntermedio a ev:Servicio ; ev:nombre "Banquete Intermedio (por persona)"@es ; ev:precioBase "75000"^^xsd:decimal ; ev:precioPorPersona "75000"^^xsd:decimal ; ev:tieneCategoria ev:CatCatering ; ev:ofrecidoPor ev:EmpresaCocinaReal ; ev:compatibleConTipo ev:Boda .
+ev:ServBanquetePremium a ev:Servicio ; ev:nombre "Banquete Premium (por persona)"@es ; ev:precioBase "130000"^^xsd:decimal ; ev:precioPorPersona "130000"^^xsd:decimal ; ev:tieneCategoria ev:CatCatering ; ev:ofrecidoPor ev:EmpresaCocinaReal ; ev:compatibleConTipo ev:Boda .
+ev:ServCocktailBasico a ev:Servicio ; ev:nombre "Cóctel de Bienvenida (por persona)"@es ; ev:precioBase "18000"^^xsd:decimal ; ev:precioPorPersona "18000"^^xsd:decimal ; ev:tieneCategoria ev:CatCatering ; ev:ofrecidoPor ev:EmpresaTradicionCaqueta ; ev:compatibleConTipo ev:EventoCorporativo .
+ev:ServBarraLibre a ev:Servicio ; ev:nombre "Barra Libre (por hora/persona)"@es ; ev:precioBase "35000"^^xsd:decimal ; ev:precioPorPersona "35000"^^xsd:decimal ; ev:tieneCategoria ev:CatCatering ; ev:ofrecidoPor ev:EmpresaSaborCaqueteno ; ev:compatibleConTipo ev:Boda ; ev:compatibleConTipo ev:Despedida .
+ev:ServParrillada a ev:Servicio ; ev:nombre "Parrillada Campestre"@es ; ev:precioBase "55000"^^xsd:decimal ; ev:precioPorPersona "55000"^^xsd:decimal ; ev:tieneCategoria ev:CatCatering ; ev:ofrecidoPor ev:EmpresaAsadosCaqueta ; ev:compatibleConTipo ev:Cumpleanos ; ev:compatibleConTipo ev:EventoCorporativo .
+
+# --- Servicios de Música ---
+ev:ServDJBasico a ev:Servicio ; ev:nombre "DJ Básico (4 horas)"@es ; ev:precioBase "600000"^^xsd:decimal ; ev:precioMinimo "450000"^^xsd:decimal ; ev:precioMaximo "900000"^^xsd:decimal ; ev:duracionHoras "4"^^xsd:decimal ; ev:tieneCategoria ev:CatMusica ; ev:ofrecidoPor ev:EmpresaRitmosCaqueta ; ev:compatibleConTipo ev:Cumpleanos ; ev:compatibleConTipo ev:Grado .
+ev:ServDJPremium a ev:Servicio ; ev:nombre "DJ Premium + Luces (6 horas)"@es ; ev:precioBase "1200000"^^xsd:decimal ; ev:precioMinimo "1000000"^^xsd:decimal ; ev:precioMaximo "1800000"^^xsd:decimal ; ev:duracionHoras "6"^^xsd:decimal ; ev:tieneCategoria ev:CatMusica ; ev:ofrecidoPor ev:EmpresaSonidoAmazonico ; ev:compatibleConTipo ev:Boda ; ev:compatibleConTipo ev:QuinceAnos .
+ev:ServOrquesta a ev:Servicio ; ev:nombre "Orquesta en Vivo (5 horas)"@es ; ev:precioBase "3500000"^^xsd:decimal ; ev:precioMinimo "2800000"^^xsd:decimal ; ev:precioMaximo "5000000"^^xsd:decimal ; ev:duracionHoras "5"^^xsd:decimal ; ev:tieneCategoria ev:CatMusica ; ev:ofrecidoPor ev:EmpresaSonidoAmazonico ; ev:compatibleConTipo ev:Boda ; ev:compatibleConTipo ev:Aniversario .
+ev:ServMariachi a ev:Servicio ; ev:nombre "Mariachi (1 hora)"@es ; ev:precioBase "900000"^^xsd:decimal ; ev:precioMinimo "700000"^^xsd:decimal ; ev:precioMaximo "1300000"^^xsd:decimal ; ev:duracionHoras "1"^^xsd:decimal ; ev:tieneCategoria ev:CatMusica ; ev:ofrecidoPor ev:EmpresaBandaOriente ; ev:compatibleConTipo ev:Boda ; ev:compatibleConTipo ev:Cumpleanos .
+
+# --- Servicios de Fotografía ---
+ev:ServFotoBasico a ev:Servicio ; ev:nombre "Fotografía Básica (4 horas)"@es ; ev:precioBase "500000"^^xsd:decimal ; ev:precioMinimo "400000"^^xsd:decimal ; ev:precioMaximo "800000"^^xsd:decimal ; ev:duracionHoras "4"^^xsd:decimal ; ev:tieneCategoria ev:CatFotografia ; ev:ofrecidoPor ev:EmpresaRecuerdosCaqueta ; ev:compatibleConTipo ev:Cumpleanos ; ev:compatibleConTipo ev:BabyShower .
+ev:ServFotoPremium a ev:Servicio ; ev:nombre "Fotografía Premium (8 horas)"@es ; ev:precioBase "1200000"^^xsd:decimal ; ev:precioMinimo "1000000"^^xsd:decimal ; ev:precioMaximo "1800000"^^xsd:decimal ; ev:duracionHoras "8"^^xsd:decimal ; ev:tieneCategoria ev:CatFotografia ; ev:ofrecidoPor ev:EmpresaLenteAmazonico ; ev:compatibleConTipo ev:Boda ; ev:compatibleConTipo ev:QuinceAnos .
+ev:ServVideoCompleto a ev:Servicio ; ev:nombre "Video Completo (todo el día)"@es ; ev:precioBase "2000000"^^xsd:decimal ; ev:precioMinimo "1500000"^^xsd:decimal ; ev:precioMaximo "3000000"^^xsd:decimal ; ev:duracionHoras "12"^^xsd:decimal ; ev:tieneCategoria ev:CatFotografia ; ev:ofrecidoPor ev:EmpresaLenteAmazonico ; ev:compatibleConTipo ev:Boda .
+ev:ServFotoVideoCompleto a ev:Servicio ; ev:nombre "Fotografía + Video Completo"@es ; ev:precioBase "2800000"^^xsd:decimal ; ev:precioMinimo "2200000"^^xsd:decimal ; ev:precioMaximo "4000000"^^xsd:decimal ; ev:duracionHoras "12"^^xsd:decimal ; ev:tieneCategoria ev:CatFotografia ; ev:ofrecidoPor ev:EmpresaLenteAmazonico ; ev:compatibleConTipo ev:Boda ; ev:compatibleConTipo ev:QuinceAnos .
+
+# --- Servicios de Salón ---
+ev:ServSalonBasico a ev:Servicio ; ev:nombre "Salón Básico (100 personas)"@es ; ev:precioBase "800000"^^xsd:decimal ; ev:precioMinimo "600000"^^xsd:decimal ; ev:precioMaximo "1200000"^^xsd:decimal ; ev:capacidadPersonas "100"^^xsd:integer ; ev:tieneCategoria ev:CatSalon ; ev:ofrecidoPor ev:EmpresaSalonAndaquies ; ev:compatibleConTipo ev:Cumpleanos ; ev:compatibleConTipo ev:BabyShower .
+ev:ServSalonMedio a ev:Servicio ; ev:nombre "Salón Intermedio (250 personas)"@es ; ev:precioBase "1800000"^^xsd:decimal ; ev:precioMinimo "1500000"^^xsd:decimal ; ev:precioMaximo "2500000"^^xsd:decimal ; ev:capacidadPersonas "250"^^xsd:integer ; ev:tieneCategoria ev:CatSalon ; ev:ofrecidoPor ev:EmpresaSalonRealCaqueta ; ev:compatibleConTipo ev:Boda ; ev:compatibleConTipo ev:QuinceAnos ; ev:compatibleConTipo ev:Grado .
+ev:ServSalonGrande a ev:Servicio ; ev:nombre "Salón Grande (500 personas)"@es ; ev:precioBase "4000000"^^xsd:decimal ; ev:precioMinimo "3000000"^^xsd:decimal ; ev:precioMaximo "6000000"^^xsd:decimal ; ev:capacidadPersonas "500"^^xsd:integer ; ev:tieneCategoria ev:CatSalon ; ev:ofrecidoPor ev:EmpresaHaciendaCaguan ; ev:compatibleConTipo ev:Boda ; ev:compatibleConTipo ev:EventoCorporativo .
+ev:ServFincaCampestre a ev:Servicio ; ev:nombre "Finca Campestre (300 personas)"@es ; ev:precioBase "3500000"^^xsd:decimal ; ev:precioMinimo "2800000"^^xsd:decimal ; ev:precioMaximo "5000000"^^xsd:decimal ; ev:capacidadPersonas "300"^^xsd:integer ; ev:tieneCategoria ev:CatSalon ; ev:ofrecidoPor ev:EmpresaElParaisoEventos ; ev:compatibleConTipo ev:Boda ; ev:compatibleConTipo ev:Despedida .
+
+# --- Servicios de Pastelería ---
+ev:ServTortaBasica a ev:Servicio ; ev:nombre "Torta Básica (50 porciones)"@es ; ev:precioBase "180000"^^xsd:decimal ; ev:precioMinimo "120000"^^xsd:decimal ; ev:precioMaximo "280000"^^xsd:decimal ; ev:tieneCategoria ev:CatPasteleria ; ev:ofrecidoPor ev:EmpresaDulcesAmazonas ; ev:compatibleConTipo ev:Cumpleanos .
+ev:ServTortaNupcial a ev:Servicio ; ev:nombre "Torta Nupcial (200 porciones)"@es ; ev:precioBase "650000"^^xsd:decimal ; ev:precioMinimo "500000"^^xsd:decimal ; ev:precioMaximo "1000000"^^xsd:decimal ; ev:tieneCategoria ev:CatPasteleria ; ev:ofrecidoPor ev:EmpresaCreacionesDulces ; ev:compatibleConTipo ev:Boda .
+ev:ServTortaQuince a ev:Servicio ; ev:nombre "Torta Quinceañera (150 porciones)"@es ; ev:precioBase "480000"^^xsd:decimal ; ev:precioMinimo "380000"^^xsd:decimal ; ev:precioMaximo "700000"^^xsd:decimal ; ev:tieneCategoria ev:CatPasteleria ; ev:ofrecidoPor ev:EmpresaDulcesAmazonas ; ev:compatibleConTipo ev:QuinceAnos .
+ev:ServMesaDulces a ev:Servicio ; ev:nombre "Mesa de Dulces Decorada"@es ; ev:precioBase "450000"^^xsd:decimal ; ev:tieneCategoria ev:CatPasteleria ; ev:ofrecidoPor ev:EmpresaDulcesAmazonas ; ev:compatibleConTipo ev:Cumpleanos ; ev:compatibleConTipo ev:BabyShower .
+
+# --- Servicios de Iluminación ---
+ev:ServIluminacionBasica a ev:Servicio ; ev:nombre "Iluminación Básica LED"@es ; ev:precioBase "400000"^^xsd:decimal ; ev:precioMinimo "300000"^^xsd:decimal ; ev:precioMaximo "600000"^^xsd:decimal ; ev:tieneCategoria ev:CatIluminacion ; ev:ofrecidoPor ev:EmpresaLucesAmazon ; ev:compatibleConTipo ev:Cumpleanos ; ev:compatibleConTipo ev:Grado .
+ev:ServIluminacionCompleta a ev:Servicio ; ev:nombre "Iluminación Completa + Efectos"@es ; ev:precioBase "1200000"^^xsd:decimal ; ev:precioMinimo "900000"^^xsd:decimal ; ev:precioMaximo "2000000"^^xsd:decimal ; ev:tieneCategoria ev:CatIluminacion ; ev:ofrecidoPor ev:EmpresaLucesAmazon ; ev:compatibleConTipo ev:Boda ; ev:compatibleConTipo ev:QuinceAnos .
+
+# --- Servicios de Animación ---
+ev:ServAnimacionInfantil a ev:Servicio ; ev:nombre "Animación Infantil (3 horas)"@es ; ev:precioBase "400000"^^xsd:decimal ; ev:precioMinimo "300000"^^xsd:decimal ; ev:precioMaximo "650000"^^xsd:decimal ; ev:duracionHoras "3"^^xsd:decimal ; ev:tieneCategoria ev:CatAnimacion ; ev:ofrecidoPor ev:EmpresaMagicosKids ; ev:compatibleConTipo ev:FiestaInfantil ; ev:compatibleConTipo ev:Cumpleanos .
+ev:ServInflables a ev:Servicio ; ev:nombre "Inflables y Juegos"@es ; ev:precioBase "550000"^^xsd:decimal ; ev:precioMinimo "400000"^^xsd:decimal ; ev:precioMaximo "800000"^^xsd:decimal ; ev:tieneCategoria ev:CatAnimacion ; ev:ofrecidoPor ev:EmpresaFiestasColoridas ; ev:compatibleConTipo ev:FiestaInfantil .
+
+# --- Servicios de Transporte ---
+ev:ServTransporteNovios a ev:Servicio ; ev:nombre "Transporte de Lujo para Novios"@es ; ev:precioBase "450000"^^xsd:decimal ; ev:precioMinimo "350000"^^xsd:decimal ; ev:precioMaximo "700000"^^xsd:decimal ; ev:tieneCategoria ev:CatTransporte ; ev:ofrecidoPor ev:EmpresaTransporteEventos ; ev:compatibleConTipo ev:Boda .
+ev:ServTransporteBus a ev:Servicio ; ev:nombre "Bus para Invitados"@es ; ev:precioBase "700000"^^xsd:decimal ; ev:precioMinimo "550000"^^xsd:decimal ; ev:precioMaximo "1200000"^^xsd:decimal ; ev:tieneCategoria ev:CatTransporte ; ev:ofrecidoPor ev:EmpresaTransporteEventos ; ev:compatibleConTipo ev:Boda ; ev:compatibleConTipo ev:EventoCorporativo .
+
+# ============================================================
+# PAQUETES (8 paquetes combinados)
+# ============================================================
+
+ev:PaqueteBodaEsencial a ev:Paquete ; ev:nombre "Paquete Boda Esencial"@es ; ev:precioBase "6500000"^^xsd:decimal ; ev:descuentoPct "10"^^xsd:decimal ; ev:paqueteParaTipo ev:Boda ; ev:incluyeServicio ev:ServDecoracionBodaBasica ; ev:incluyeServicio ev:ServBanqueteBasico ; ev:incluyeServicio ev:ServDJBasico ; ev:incluyeServicio ev:ServFotoBasico ; ev:incluyeServicio ev:ServSalonMedio ; ev:incluyeServicio ev:ServTortaNupcial .
+ev:PaqueteBodaPremium a ev:Paquete ; ev:nombre "Paquete Boda Premium"@es ; ev:precioBase "22000000"^^xsd:decimal ; ev:descuentoPct "15"^^xsd:decimal ; ev:paqueteParaTipo ev:Boda ; ev:incluyeServicio ev:ServDecoracionBodaPremium ; ev:incluyeServicio ev:ServBanquetePremium ; ev:incluyeServicio ev:ServDJPremium ; ev:incluyeServicio ev:ServFotoVideoCompleto ; ev:incluyeServicio ev:ServSalonGrande ; ev:incluyeServicio ev:ServTortaNupcial ; ev:incluyeServicio ev:ServIluminacionCompleta .
+ev:PaqueteCumpleAdultos a ev:Paquete ; ev:nombre "Paquete Cumpleaños Adultos"@es ; ev:precioBase "2200000"^^xsd:decimal ; ev:descuentoPct "8"^^xsd:decimal ; ev:paqueteParaTipo ev:Cumpleanos ; ev:incluyeServicio ev:ServDecoracionCumpleanos ; ev:incluyeServicio ev:ServBanqueteBasico ; ev:incluyeServicio ev:ServDJBasico ; ev:incluyeServicio ev:ServFotoBasico ; ev:incluyeServicio ev:ServTortaBasica .
+ev:PaqueteFiestaInfantil a ev:Paquete ; ev:nombre "Paquete Fiesta Infantil Mágica"@es ; ev:precioBase "1800000"^^xsd:decimal ; ev:descuentoPct "10"^^xsd:decimal ; ev:paqueteParaTipo ev:FiestaInfantil ; ev:incluyeServicio ev:ServDecoracionCumpleanos ; ev:incluyeServicio ev:ServAnimacionInfantil ; ev:incluyeServicio ev:ServInflables ; ev:incluyeServicio ev:ServTortaBasica .
+ev:PaqueteQuinceañera a ev:Paquete ; ev:nombre "Paquete Quinceañera"@es ; ev:precioBase "8000000"^^xsd:decimal ; ev:descuentoPct "12"^^xsd:decimal ; ev:paqueteParaTipo ev:QuinceAnos ; ev:incluyeServicio ev:ServDecoracionQuince ; ev:incluyeServicio ev:ServBanqueteIntermedio ; ev:incluyeServicio ev:ServDJPremium ; ev:incluyeServicio ev:ServFotoPremium ; ev:incluyeServicio ev:ServSalonMedio ; ev:incluyeServicio ev:ServTortaQuince .
+ev:PaqueteGrado a ev:Paquete ; ev:nombre "Paquete Grado"@es ; ev:precioBase "3500000"^^xsd:decimal ; ev:descuentoPct "8"^^xsd:decimal ; ev:paqueteParaTipo ev:Grado ; ev:incluyeServicio ev:ServDecoracionGrado ; ev:incluyeServicio ev:ServBanqueteBasico ; ev:incluyeServicio ev:ServDJBasico ; ev:incluyeServicio ev:ServFotoBasico ; ev:incluyeServicio ev:ServTortaBasica .
+ev:PaqueteBabyShower a ev:Paquete ; ev:nombre "Paquete Baby Shower"@es ; ev:precioBase "1500000"^^xsd:decimal ; ev:descuentoPct "8"^^xsd:decimal ; ev:paqueteParaTipo ev:BabyShower ; ev:incluyeServicio ev:ServDecoracionCumpleanos ; ev:incluyeServicio ev:ServCocktailBasico ; ev:incluyeServicio ev:ServFotoBasico ; ev:incluyeServicio ev:ServTortaBasica ; ev:incluyeServicio ev:ServMesaDulces .
+ev:PaqueteCorporativo a ev:Paquete ; ev:nombre "Paquete Corporativo"@es ; ev:precioBase "5000000"^^xsd:decimal ; ev:descuentoPct "10"^^xsd:decimal ; ev:paqueteParaTipo ev:EventoCorporativo ; ev:incluyeServicio ev:ServSalonMedio ; ev:incluyeServicio ev:ServCocktailBasico ; ev:incluyeServicio ev:ServIluminacionBasica ; ev:incluyeServicio ev:ServFotoBasico ; ev:incluyeServicio ev:ServParrillada .
+
+# ============================================================
+# ACCESORIOS (12 accesorios)
+# ============================================================
+
+ev:AccArcoFloral a ev:Accesorio ; ev:nombre "Arco Floral"@es ; ev:precioBase "350000"^^xsd:decimal ; ev:accesorioParaTipo ev:Boda ; ev:accesorioParaTipo ev:QuinceAnos .
+ev:AccCentrosMesa a ev:Accesorio ; ev:nombre "Centros de Mesa Florales"@es ; ev:precioBase "80000"^^xsd:decimal ; ev:accesorioParaTipo ev:Boda ; ev:accesorioParaTipo ev:QuinceAnos .
+ev:AccGlobos a ev:Accesorio ; ev:nombre "Globos Decorativos"@es ; ev:precioBase "120000"^^xsd:decimal ; ev:accesorioParaTipo ev:Cumpleanos ; ev:accesorioParaTipo ev:BabyShower .
+ev:AccFuenteChocolate a ev:Accesorio ; ev:nombre "Fuente de Chocolate"@es ; ev:precioBase "250000"^^xsd:decimal ; ev:accesorioParaTipo ev:Boda ; ev:accesorioParaTipo ev:Cumpleanos .
+ev:AccPhotobooth a ev:Accesorio ; ev:nombre "Photobooth"@es ; ev:precioBase "700000"^^xsd:decimal ; ev:accesorioParaTipo ev:Boda ; ev:accesorioParaTipo ev:QuinceAnos .
+ev:AccSillasTiffany a ev:Accesorio ; ev:nombre "Sillas Tiffany"@es ; ev:precioBase "8000"^^xsd:decimal ; ev:accesorioParaTipo ev:Boda ; ev:accesorioParaTipo ev:QuinceAnos .
+ev:AccManteleria a ev:Accesorio ; ev:nombre "Mantelería Fina"@es ; ev:precioBase "35000"^^xsd:decimal ; ev:accesorioParaTipo ev:Boda .
+ev:AccMesaDulces a ev:Accesorio ; ev:nombre "Mesa de Dulces"@es ; ev:precioBase "250000"^^xsd:decimal ; ev:accesorioParaTipo ev:Cumpleanos ; ev:accesorioParaTipo ev:BabyShower .
+ev:AccBanner a ev:Accesorio ; ev:nombre "Banner Personalizado"@es ; ev:precioBase "90000"^^xsd:decimal ; ev:accesorioParaTipo ev:Cumpleanos ; ev:accesorioParaTipo ev:Grado .
+ev:AccInvGlobo a ev:Accesorio ; ev:nombre "Globo Aerostático"@es ; ev:precioBase "200000"^^xsd:decimal ; ev:accesorioParaTipo ev:Despedida ; ev:accesorioParaTipo ev:Boda .
+ev:AccPistaBaile a ev:Accesorio ; ev:nombre "Pista de Baile LED"@es ; ev:precioBase "350000"^^xsd:decimal ; ev:accesorioParaTipo ev:Boda ; ev:accesorioParaTipo ev:QuinceAnos .
+ev:AccCortinasLuz a ev:Accesorio ; ev:nombre "Cortinas de Luz"@es ; ev:precioBase "180000"^^xsd:decimal ; ev:accesorioParaTipo ev:Boda ; ev:accesorioParaTipo ev:Grado .
