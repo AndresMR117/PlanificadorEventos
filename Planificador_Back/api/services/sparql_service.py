@@ -34,50 +34,55 @@ class SPARQLService:
     def obtener_proveedores(self) -> List[Dict]:
         query = """
         PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-        PREFIX ev: <http://eventos.caqueta.co/ontologia#>
+        PREFIX ev:  <http://eventos.caqueta.co/ontologia#>
+        PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
         
-        SELECT ?nombre ?calificacion ?ciudad ?telefono ?whatsapp ?instagram WHERE {
+        SELECT DISTINCT ?nombre ?calificacion ?ciudad ?telefono ?whatsapp ?instagram WHERE {
             ?empresa rdf:type ev:Empresa .
             ?empresa ev:nombre ?nombre .
             OPTIONAL { ?empresa ev:calificacion ?calificacion }
-            OPTIONAL { ?empresa ev:ciudad ?ciudad }
-            OPTIONAL { ?empresa ev:telefono ?telefono }
-            OPTIONAL { ?empresa ev:whatsapp ?whatsapp }
-            OPTIONAL { ?empresa ev:instagram ?instagram }
+            OPTIONAL { ?empresa ev:ciudad      ?ciudad      }
+            OPTIONAL { ?empresa ev:telefono    ?telefono    }
+            OPTIONAL { ?empresa ev:whatsapp    ?whatsapp    }
+            OPTIONAL { ?empresa ev:instagram   ?instagram   }
         }
-        ORDER BY DESC(?calificacion)
+        ORDER BY DESC(xsd:decimal(?calificacion))
         """
         return self.query(query)
     
     def obtener_proveedores_destacados(self) -> List[Dict]:
+        # Sin LIMIT para devolver todos ordenados por calificacion.
+        # El caller decide cuántos mostrar.
         query = """
         PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-        PREFIX ev: <http://eventos.caqueta.co/ontologia#>
+        PREFIX ev:  <http://eventos.caqueta.co/ontologia#>
         PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
         
-        SELECT ?nombre ?calificacion ?ciudad WHERE {
+        SELECT DISTINCT ?nombre ?calificacion ?ciudad ?telefono WHERE {
             ?empresa rdf:type ev:Empresa .
-            ?empresa ev:nombre ?nombre .
+            ?empresa ev:nombre       ?nombre       .
             ?empresa ev:calificacion ?calificacion .
-            OPTIONAL { ?empresa ev:ciudad ?ciudad }
+            OPTIONAL { ?empresa ev:ciudad   ?ciudad   }
+            OPTIONAL { ?empresa ev:telefono ?telefono }
         }
-        ORDER BY DESC(?calificacion)
-        LIMIT 10
+        ORDER BY DESC(xsd:decimal(?calificacion))
         """
         return self.query(query)
     
     def obtener_todos_proveedores(self) -> List[Dict]:
         query = """
         PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-        PREFIX ev: <http://eventos.caqueta.co/ontologia#>
+        PREFIX ev:  <http://eventos.caqueta.co/ontologia#>
+        PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
         
-        SELECT ?nombre ?calificacion ?ciudad WHERE {
+        SELECT DISTINCT ?nombre ?calificacion ?ciudad ?telefono WHERE {
             ?empresa rdf:type ev:Empresa .
             ?empresa ev:nombre ?nombre .
             OPTIONAL { ?empresa ev:calificacion ?calificacion }
-            OPTIONAL { ?empresa ev:ciudad ?ciudad }
+            OPTIONAL { ?empresa ev:ciudad       ?ciudad       }
+            OPTIONAL { ?empresa ev:telefono     ?telefono     }
         }
-        ORDER BY DESC(?calificacion)
+        ORDER BY DESC(xsd:decimal(?calificacion))
         """
         return self.query(query)
     
@@ -101,23 +106,25 @@ class SPARQLService:
     def obtener_proveedores_por_ciudad(self, ciudad: str) -> List[Dict]:
         query = f"""
         PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-        PREFIX ev: <http://eventos.caqueta.co/ontologia#>
+        PREFIX ev:  <http://eventos.caqueta.co/ontologia#>
+        PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
         
-        SELECT ?nombre ?calificacion ?telefono WHERE {{
+        SELECT DISTINCT ?nombre ?calificacion ?telefono WHERE {{
             ?empresa rdf:type ev:Empresa .
-            ?empresa ev:nombre ?nombre .
-            ?empresa ev:ciudad "{ciudad}"@es .
+            ?empresa ev:nombre  ?nombre  .
+            ?empresa ev:ciudad  "{ciudad}"@es .
             OPTIONAL {{ ?empresa ev:calificacion ?calificacion }}
-            OPTIONAL {{ ?empresa ev:telefono ?telefono }}
+            OPTIONAL {{ ?empresa ev:telefono     ?telefono     }}
         }}
-        ORDER BY DESC(?calificacion)
+        ORDER BY DESC(xsd:decimal(?calificacion))
         """
         return self.query(query)
     
     def obtener_proveedores_por_categoria(self, categoria: str) -> List[Dict]:
         query = f"""
         PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-        PREFIX ev: <http://eventos.caqueta.co/ontologia#>
+        PREFIX ev:  <http://eventos.caqueta.co/ontologia#>
+        PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
         
         SELECT DISTINCT ?nombre ?calificacion ?ciudad WHERE {{
             ?servicio rdf:type ev:Servicio .
@@ -128,7 +135,7 @@ class SPARQLService:
             OPTIONAL {{ ?empresa ev:calificacion ?calificacion }}
             OPTIONAL {{ ?empresa ev:ciudad ?ciudad }}
         }}
-        ORDER BY DESC(?calificacion)
+        ORDER BY DESC(xsd:decimal(?calificacion))
         """
         return self.query(query)
     
@@ -187,19 +194,21 @@ class SPARQLService:
     def obtener_servicios_por_tipo(self, tipo_evento: str) -> List[Dict]:
         query = f"""
         PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-        PREFIX ev: <http://eventos.caqueta.co/ontologia#>
+        PREFIX ev:  <http://eventos.caqueta.co/ontologia#>
+        PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
         
-        SELECT ?nombre ?precioBase ?precioPorPersona ?categoria ?empresa WHERE {{
+        SELECT DISTINCT ?nombre ?precioBase ?precioPorPersona ?categoria ?empresa WHERE {{
             ?servicio rdf:type ev:Servicio .
             ?servicio ev:nombre ?nombre .
             ?servicio ev:compatibleConTipo ev:{tipo_evento} .
-            OPTIONAL {{ ?servicio ev:precioBase ?precioBase }}
+            OPTIONAL {{ ?servicio ev:precioBase      ?precioBase      }}
             OPTIONAL {{ ?servicio ev:precioPorPersona ?precioPorPersona }}
-            ?servicio ev:tieneCategoria ?categoriaObj . ?categoriaObj ev:nombre ?categoria .
-            ?servicio ev:ofrecidoPor ?empresaObj . ?empresaObj ev:nombre ?empresa .
+            ?servicio ev:tieneCategoria ?categoriaObj .
+            ?categoriaObj ev:nombre ?categoria .
+            ?servicio ev:ofrecidoPor ?empresaObj .
+            ?empresaObj ev:nombre ?empresa .
         }}
-        ORDER BY ?precioBase
-        LIMIT 30
+        ORDER BY xsd:decimal(?precioBase)
         """
         return self.query(query)
     
@@ -228,16 +237,15 @@ class SPARQLService:
         PREFIX ev: <http://eventos.caqueta.co/ontologia#>
         PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
         
-        SELECT ?nombre ?precioBase ?categoria ?empresa WHERE {{
+        SELECT DISTINCT ?nombre ?precioBase ?categoria ?empresa WHERE {{
             ?servicio rdf:type ev:Servicio .
             ?servicio ev:nombre ?nombre .
             ?servicio ev:precioBase ?precioBase .
-            FILTER(?precioBase >= {min_precio} && ?precioBase <= {max_precio})
+            FILTER(xsd:decimal(?precioBase) >= {min_precio} && xsd:decimal(?precioBase) <= {max_precio})
             ?servicio ev:tieneCategoria ?categoriaObj . ?categoriaObj ev:nombre ?categoria .
             ?servicio ev:ofrecidoPor ?empresaObj . ?empresaObj ev:nombre ?empresa .
         }}
-        ORDER BY ?precioBase
-        LIMIT 30
+        ORDER BY xsd:decimal(?precioBase)
         """
         return self.query(query)
     
@@ -261,15 +269,17 @@ class SPARQLService:
     def obtener_paquetes_por_tipo(self, tipo_evento: str) -> List[Dict]:
         query = f"""
         PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-        PREFIX ev: <http://eventos.caqueta.co/ontologia#>
+        PREFIX ev:  <http://eventos.caqueta.co/ontologia#>
+        PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
         
-        SELECT ?nombre ?precioBase ?descuentoPct WHERE {{
+        SELECT DISTINCT ?nombre ?precioBase ?descuentoPct WHERE {{
             ?paquete rdf:type ev:Paquete .
             ?paquete ev:nombre ?nombre .
             ?paquete ev:paqueteParaTipo ev:{tipo_evento} .
-            OPTIONAL {{ ?paquete ev:precioBase ?precioBase }}
+            OPTIONAL {{ ?paquete ev:precioBase   ?precioBase   }}
             OPTIONAL {{ ?paquete ev:descuentoPct ?descuentoPct }}
         }}
+        ORDER BY xsd:decimal(?precioBase)
         """
         return self.query(query)
     
@@ -416,42 +426,3 @@ class SPARQLService:
         ORDER BY DESC(?total)
         """
         return self.query(query)
-
-    # ==================== MAPEO TIPO EVENTO A URI TTL ====================
-    
-    TIPO_A_URI = {
-        'Boda': 'Boda',
-        'Cumpleaños': 'Cumpleanos',
-        'Cumpleanos': 'Cumpleanos',
-        'Grado': 'Grado',
-        'Quinceañera': 'QuinceAnos',
-        'QuinceAnos': 'QuinceAnos',
-        'Baby Shower': 'BabyShower',
-        'Fiesta Infantil': 'FiestaInfantil',
-        'Despedida de Soltero': 'Despedida',
-        'Aniversario': 'Aniversario',
-        'Bautizo': 'Bautizo',
-        'Primera Comunión': 'PrimeraComunion',
-        'Evento Corporativo': 'EventoCorporativo',
-        'Conferencia': 'Conferencia',
-    }
-    
-    def tipo_a_uri(self, tipo_evento: str) -> str:
-        """Convierte nombre de tipo evento a su URI en la ontología TTL"""
-        return self.TIPO_A_URI.get(tipo_evento, tipo_evento)
-    
-    def recomendar_servicios(self, tipo_evento: str) -> List[Dict]:
-        """Alias para obtener_servicios_por_tipo con mapeo correcto de URI"""
-        uri = self.tipo_a_uri(tipo_evento)
-        return self.obtener_servicios_por_tipo(uri)
-    
-    def recomendar_paquetes(self, tipo_evento: str) -> List[Dict]:
-        """Alias para obtener_paquetes_por_tipo con mapeo correcto de URI"""
-        uri = self.tipo_a_uri(tipo_evento)
-        return self.obtener_paquetes_por_tipo(uri)
-    
-    def recomendar_accesorios(self, tipo_evento: str) -> List[Dict]:
-        """Alias para obtener_accesorios_por_tipo con mapeo correcto de URI"""
-        uri = self.tipo_a_uri(tipo_evento)
-        return self.obtener_accesorios_por_tipo(uri)
-

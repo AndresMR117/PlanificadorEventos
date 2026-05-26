@@ -428,8 +428,6 @@
             z-index: 200;
         }
 
-        .save-button-container.hidden { display: none; }
-
         .btn-save-floating {
             background: var(--green);
             color: white;
@@ -448,16 +446,77 @@
             animation: floatIn 0.3s ease;
         }
 
-        @keyframes floatIn {
-            from { opacity: 0; transform: translateY(16px) scale(0.95); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
+        .btn-save-floating:disabled {
+            background: #b0bec5;
+            box-shadow: none;
+            cursor: not-allowed;
+            opacity: 0.7;
+            transform: none !important;
         }
 
-        .btn-save-floating:hover {
+        .btn-save-floating:not(:disabled):hover {
             background: var(--green-dark);
             transform: translateY(-2px);
             box-shadow: 0 12px 30px rgba(46,204,113,0.45);
         }
+
+        /* ── RESET BUTTON ── */
+        .btn-reset-chat {
+            position: fixed;
+            bottom: 160px;
+            right: 30px;
+            z-index: 200;
+            background: #fff;
+            color: #ef4444;
+            border: 1.5px solid #ef4444;
+            padding: 11px 18px;
+            border-radius: 14px;
+            cursor: pointer;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            box-shadow: 0 4px 16px rgba(239,68,68,0.15);
+            transition: all 0.22s ease;
+        }
+        .btn-reset-chat:hover {
+            background: #ef4444;
+            color: #fff;
+            box-shadow: 0 8px 24px rgba(239,68,68,0.35);
+            transform: translateY(-2px);
+        }
+        .reset-modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.45);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .reset-modal-overlay.active { display: flex; }
+        .reset-modal {
+            background: #fff;
+            border-radius: 18px;
+            padding: 32px 28px 24px;
+            max-width: 360px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.18);
+            text-align: center;
+            animation: floatIn 0.25s ease;
+        }
+        .reset-modal-icon { font-size: 2rem; margin-bottom: 12px; }
+        .reset-modal h3 { font-family: 'Playfair Display', serif; font-size: 1.25rem; color: var(--text); margin-bottom: 8px; }
+        .reset-modal p { font-size: 0.88rem; color: var(--muted); margin-bottom: 24px; line-height: 1.5; }
+        .reset-modal-actions { display: flex; gap: 10px; justify-content: center; }
+        .reset-modal-actions button { padding: 10px 22px; border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 0.875rem; font-weight: 600; cursor: pointer; border: none; transition: all 0.18s; }
+        .btn-modal-cancel { background: var(--border); color: var(--muted); }
+        .btn-modal-cancel:hover { background: #d1d5db; }
+        .btn-modal-confirm { background: #ef4444; color: white; }
+        .btn-modal-confirm:hover { background: #dc2626; }
+        @media (max-width: 640px) { .btn-reset-chat { right: 14px; bottom: 155px; } }
 
         /* ── SUCCESS MESSAGE STYLE ── */
         .bubble-success {
@@ -541,13 +600,31 @@
 
 </div>
 
-<!-- ── FLOATING SAVE BUTTON ── -->
-<div class="save-button-container hidden" id="saveButtonContainer">
-    <button class="btn-save-floating" id="floatingSaveBtn" onclick="guardarEventoDesdeFlotante()">
+<!-- ── FLOATING SAVE BUTTON ── siempre visible; se activa cuando hay 5 datos ── -->
+<div class="save-button-container" id="saveButtonContainer">
+    <button class="btn-save-floating" id="floatingSaveBtn" onclick="guardarEventoDesdeFlotante()" disabled title="Completa el evento en el chat para habilitar">
         <i class="fas fa-save"></i> Guardar Evento
     </button>
 </div>
 
+
+<!-- ── RESET CHAT BUTTON ── -->
+<button class="btn-reset-chat" onclick="mostrarModalReset()" title="Reiniciar conversación">
+    <i class="fas fa-redo-alt"></i> Reiniciar Chat
+</button>
+
+<!-- ── MODAL CONFIRMACIÓN RESET ── -->
+<div class="reset-modal-overlay" id="resetModalOverlay">
+    <div class="reset-modal">
+        <div class="reset-modal-icon">🔄</div>
+        <h3>¿Reiniciar conversación?</h3>
+        <p>Se borrará todo el historial del chat y los datos del evento. Esta acción no se puede deshacer.</p>
+        <div class="reset-modal-actions">
+            <button class="btn-modal-cancel" onclick="cerrarModalReset()">Cancelar</button>
+            <button class="btn-modal-confirm" onclick="confirmarReset()">Sí, reiniciar</button>
+        </div>
+    </div>
+</div>
 <script src="/js/api.js"></script>
 <script>
     // ── Init time ──
@@ -568,49 +645,49 @@
     }
 
     function normalizarTipoEvento(tipo) {
-        if (!tipo) return 'Boda';
-        let tipoLimpio = tipo.trim();
-        for (const valido of TIPOS_VALIDOS) {
-            if (tipoLimpio.toLowerCase() === valido.toLowerCase()) return valido;
-        }
-        for (const valido of TIPOS_VALIDOS) {
-            if (tipoLimpio.toLowerCase().includes(valido.toLowerCase()) ||
-                valido.toLowerCase().includes(tipoLimpio.toLowerCase())) return valido;
-        }
-        if (tipoLimpio.toLowerCase().includes('boda')) return 'Boda';
-        if (tipoLimpio.toLowerCase().includes('cumple')) return 'Cumpleaños';
-        if (tipoLimpio.toLowerCase().includes('grado') || tipoLimpio.toLowerCase().includes('gradu')) return 'Grado';
-        if (tipoLimpio.toLowerCase().includes('quince')) return 'Quinceañera';
-        return 'Boda';
+        if (!tipo) return '';
+        const t = tipo.toLowerCase().trim()
+            .replace(/á/g,'a').replace(/é/g,'e').replace(/í/g,'i')
+            .replace(/ó/g,'o').replace(/ú/g,'u').replace(/ñ/g,'n');
+        if (t.includes('boda') || t.includes('matrimonio'))   return 'Boda';
+        if (t.includes('cumple'))                              return 'Cumpleaños';
+        if (t.includes('grado') || t.includes('gradu'))       return 'Grado';
+        if (t.includes('quince'))                              return 'Quinceañera';
+        if (t.includes('baby') || t.includes('shower'))       return 'BabyShower';
+        if (t.includes('infantil'))                            return 'FiestaInfantil';
+        if (t.includes('despedida'))                           return 'Despedida';
+        if (t.includes('aniversario'))                         return 'Aniversario';
+        if (t.includes('corporativo'))                         return 'EventoCorporativo';
+        return tipo.trim();
     }
 
     function extraerDatosParaGuardar(respuesta) {
-        // Estrategia 1: leer el bloque estructurado ---DATOS_EVENTO---
+        // ── Estrategia 1: bloque estructurado del backend ──────────────
         const bloqueMatch = respuesta.match(/---DATOS_EVENTO---([\s\S]*?)---FIN_DATOS---/);
         if (bloqueMatch) {
             const bloque = bloqueMatch[1];
             const get = (campo) => {
-                const m = bloque.match(new RegExp(campo + ':\s*(.+)', 'i'));
+                const m = bloque.match(new RegExp(campo + ':\\s*(.+)', 'i'));
                 return m ? m[1].trim() : null;
             };
-            const tipo      = normalizarTipoEvento(get('TIPO') || '');
-            const presupStr = (get('PRESUPUESTO') || '').replace(/[$.\s]/g, '').replace(/,/g, '');
-            const persStr   = (get('PERSONAS') || '').replace(/\D/g, '');
-            const ciudad    = get('CIUDAD') || null;
-            const fechaRaw  = get('FECHA') || null;
+            const tipo       = normalizarTipoEvento(get('TIPO') || '');
+            const presupuStr = (get('PRESUPUESTO') || '').replace(/[^0-9]/g, '');
+            const personasStr= (get('PERSONAS')   || '').replace(/[^0-9]/g, '');
+            const ciudad     = get('CIUDAD') || null;
+            const fechaRaw   = get('FECHA')  || null;
+            const presupuesto= presupuStr  ? Number(presupuStr)  : null;
+            const personas   = personasStr ? parseInt(personasStr) : null;
 
-            const presupuesto = presupStr ? parseInt(presupStr) : null;
-            const personas    = persStr   ? parseInt(persStr)   : null;
-
-            // Validar fecha ISO o convertir
             let fechaISO = null;
             if (fechaRaw) {
                 if (/^\d{4}-\d{2}-\d{2}$/.test(fechaRaw)) {
                     fechaISO = fechaRaw;
                 } else {
-                    const meses = {'enero':'01','febrero':'02','marzo':'03','abril':'04','mayo':'05',
-                        'junio':'06','julio':'07','agosto':'08','septiembre':'09','octubre':'10',
-                        'noviembre':'11','diciembre':'12'};
+                    const meses = {
+                        'enero':'01','febrero':'02','marzo':'03','abril':'04','mayo':'05',
+                        'junio':'06','julio':'07','agosto':'08','septiembre':'09',
+                        'octubre':'10','noviembre':'11','diciembre':'12'
+                    };
                     const fm = fechaRaw.match(/(\d{1,2})\s*(?:de)?\s*([a-záéíóúñ]+)\s*(?:de)?\s*(\d{4})/i);
                     if (fm) {
                         const mes = meses[fm[2].toLowerCase()];
@@ -618,39 +695,141 @@
                     }
                 }
             }
-
             if (tipo && presupuesto && personas && ciudad) {
                 return { tipo, presupuesto, personas, ciudad, fecha: fechaISO };
             }
         }
-
-        // Estrategia 2: extraccion heuristica de la respuesta libre
-        const tipoMatch      = respuesta.match(/TIPO:\s*([^\n\r|]+)/i);
-        const presupMatch    = respuesta.match(/PRESUPUESTO:\s*\$?([\d.,]+)/i);
-        const persMatch      = respuesta.match(/PERSONAS:\s*(\d+)/i);
-        const ciudadMatch    = respuesta.match(/CIUDAD:\s*([^\n\r|]+)/i);
-        const fechaMatch     = respuesta.match(/FECHA:\s*(\d{4}-\d{2}-\d{2}|\d{1,2}[\/\-]\d{1,2}[\/\-]\d{4})/i);
-
-        const tipo      = tipoMatch   ? normalizarTipoEvento(tipoMatch[1].trim())                            : null;
-        const presup2   = presupMatch ? parseInt(presupMatch[1].replace(/[.,]/g,''))                         : null;
-        const personas2 = persMatch   ? parseInt(persMatch[1])                                               : null;
-        const ciudad2   = ciudadMatch ? ciudadMatch[1].trim()                                                : null;
-        const fecha2    = fechaMatch  ? fechaMatch[1]                                                        : null;
-
-        if (tipo && presup2 && personas2 && ciudad2) {
-            return { tipo, presupuesto: presup2, personas: personas2, ciudad: ciudad2, fecha: fecha2 };
+        // ── Estrategia 2: heurística sobre texto libre ──────────────────
+        const tipoM   = respuesta.match(/TIPO:\s*([^\n\r]+)/i);
+        const pptoM   = respuesta.match(/PRESUPUESTO:\s*\$?([\d.,]+)/i);
+        const persM   = respuesta.match(/PERSONAS:\s*(\d+)/i);
+        const ciudM   = respuesta.match(/CIUDAD:\s*([^\n\r]+)/i);
+        const fechaM  = respuesta.match(/FECHA:\s*(\d{4}-\d{2}-\d{2})/i);
+        const tipo2   = tipoM  ? normalizarTipoEvento(tipoM[1].trim()) : null;
+        const ppto2   = pptoM  ? parseInt(pptoM[1].replace(/[.,]/g,'')) : null;
+        const pers2   = persM  ? parseInt(persM[1])                     : null;
+        const ciud2   = ciudM  ? ciudM[1].trim()                        : null;
+        const fech2   = fechaM ? fechaM[1]                              : null;
+        if (tipo2 && ppto2 && pers2 && ciud2) {
+            return { tipo: tipo2, presupuesto: ppto2, personas: pers2, ciudad: ciud2, fecha: fech2 };
         }
         return null;
     }
 
-    function mostrarBotonGuardar(datosEvento) {
-        if (datosEvento) {
-            ultimosDatosEvento = datosEvento;
-            document.getElementById('saveButtonContainer').classList.remove('hidden');
+    // Estado acumulado del evento (se va llenando con cada respuesta del bot)
+    let estadoEvento = { tipo: null, presupuesto: null, personas: null, ciudad: null, fecha: null };
+
+    function actualizarEstadoEvento(datosNuevos) {
+        // Solo sobreescribe los campos que vienen con valor real
+        if (datosNuevos.tipo)        estadoEvento.tipo        = datosNuevos.tipo;
+        if (datosNuevos.presupuesto) estadoEvento.presupuesto = datosNuevos.presupuesto;
+        if (datosNuevos.personas)    estadoEvento.personas    = datosNuevos.personas;
+        if (datosNuevos.ciudad)      estadoEvento.ciudad      = datosNuevos.ciudad;
+        if (datosNuevos.fecha)       estadoEvento.fecha       = datosNuevos.fecha;
+    }
+
+    function refrescarBotonGuardar() {
+        const btn = document.getElementById('floatingSaveBtn');
+        if (!btn) return;
+        const e = estadoEvento;
+        const completo = e.tipo && e.presupuesto && e.personas && e.ciudad;
+        if (completo) {
+            ultimosDatosEvento = { ...e };
+            btn.disabled = false;
+            btn.title = '¡Haz clic para guardar tu evento!';
+        } else {
+            btn.disabled = true;
+            const faltantes = [];
+            if (!e.tipo)        faltantes.push('tipo de evento');
+            if (!e.presupuesto) faltantes.push('presupuesto');
+            if (!e.personas)    faltantes.push('número de personas');
+            if (!e.ciudad)      faltantes.push('ciudad');
+            if (!e.fecha)       faltantes.push('fecha');
+            btn.title = 'Faltan datos: ' + faltantes.join(', ');
         }
     }
 
+    function extraerDatosParciales(respuesta) {
+        // Intenta extraer cualquier dato disponible de la respuesta del bot
+        // (no exige que todos estén presentes)
+        const datos = {};
+
+        // ── Estrategia 1: bloque estructurado del backend ──────────────
+        const bloqueMatch = respuesta.match(/---DATOS_EVENTO---([\s\S]*?)---FIN_DATOS---/);
+        if (bloqueMatch) {
+            const bloque = bloqueMatch[1];
+            const get = (campo) => {
+                const m = bloque.match(new RegExp(campo + ':\\s*(.+)', 'i'));
+                return m ? m[1].trim() : null;
+            };
+            const tipoRaw    = get('TIPO');
+            const presupuStr = (get('PRESUPUESTO') || '').replace(/[^0-9]/g, '');
+            const personasStr= (get('PERSONAS')    || '').replace(/[^0-9]/g, '');
+            const ciudadRaw  = get('CIUDAD');
+            const fechaRaw   = get('FECHA');
+
+            if (tipoRaw && !tipoRaw.includes('['))        datos.tipo        = normalizarTipoEvento(tipoRaw);
+            if (presupuStr && presupuStr !== '0')         datos.presupuesto = Number(presupuStr);
+            if (personasStr && personasStr !== '0')       datos.personas    = parseInt(personasStr);
+            if (ciudadRaw && !ciudadRaw.includes('['))    datos.ciudad      = ciudadRaw;
+            if (fechaRaw  && /^\d{4}-\d{2}-\d{2}$/.test(fechaRaw)) datos.fecha = fechaRaw;
+        }
+
+        // ── Estrategia 2: parsear la tarjeta resumen visual del bot ─────
+        // Detecta líneas como: "• 🎉 Tipo: Cumpleaños" o "Tipo de evento: Grado"
+        if (!datos.tipo) {
+            const m = respuesta.match(/Tipo(?:\s+de\s+evento)?[:\s]+([A-Za-záéíóúÁÉÍÓÚñÑ]+)/i);
+            if (m) datos.tipo = normalizarTipoEvento(m[1].trim());
+        }
+        if (!datos.presupuesto) {
+            const m = respuesta.match(/Presupuesto[:\s]+\$?([\d.,]+)\s*COP/i);
+            if (m) {
+                const n = Number(m[1].replace(/[.,]/g, ''));
+                if (n > 0) datos.presupuesto = n;
+            }
+        }
+        if (!datos.personas) {
+            const m = respuesta.match(/Personas[:\s]+(\d+)/i);
+            if (m) datos.personas = parseInt(m[1]);
+        }
+        if (!datos.ciudad) {
+            const m = respuesta.match(/Ciudad[:\s]+([A-Za-záéíóúÁÉÍÓÚñÑ\s]+?)(?:\n|•|$)/i);
+            if (m) {
+                const c = m[1].trim();
+                if (c && !c.includes('[')) datos.ciudad = c;
+            }
+        }
+        if (!datos.fecha) {
+            // Formato ISO yyyy-mm-dd
+            const m = respuesta.match(/Fecha[:\s]+(\d{4}-\d{2}-\d{2})/i);
+            if (m) datos.fecha = m[1];
+            else {
+                // Formato "29 de mayo del 2026" o "29 de mayo de 2026"
+                const meses = {
+                    'enero':'01','febrero':'02','marzo':'03','abril':'04','mayo':'05',
+                    'junio':'06','julio':'07','agosto':'08','septiembre':'09',
+                    'octubre':'10','noviembre':'11','diciembre':'12'
+                };
+                const fm = respuesta.match(/Fecha[:\s]+(\d{1,2})\s+de\s+([a-záéíóúñ]+)\s+(?:del?\s+)?(\d{4})/i);
+                if (fm) {
+                    const mes = meses[fm[2].toLowerCase()];
+                    if (mes) datos.fecha = `${fm[3]}-${mes}-${fm[1].padStart(2,'0')}`;
+                }
+            }
+        }
+
+        return datos;
+    }
+
+    function mostrarBotonGuardar(datosEvento) {
+        // Compatibilidad con llamadas antiguas — ya no oculta/muestra, solo actualiza
+        if (datosEvento) actualizarEstadoEvento(datosEvento);
+        refrescarBotonGuardar();
+    }
+
     async function guardarEventoDesdeFlotante() {
+        const btn = document.getElementById('floatingSaveBtn');
+        if (btn && btn.disabled) return;
         if (!ultimosDatosEvento) { alert('No hay datos de evento para guardar.'); return; }
         if (typeof usuarioActual === 'undefined' || !usuarioActual) {
             alert('Debes iniciar sesión primero.');
@@ -658,18 +837,21 @@
             return;
         }
         const datos = ultimosDatosEvento;
+        const fechaDefault = new Date();
+        fechaDefault.setMonth(fechaDefault.getMonth() + 3);
+        const fechaISO = datos.fecha || fechaDefault.toISOString().split('T')[0];
+
         const eventoData = {
-            usuario_id: usuarioActual.id,
-            conversacion_id: typeof conversacionId !== 'undefined' ? conversacionId : null,
-            nombre: `${datos.tipo} - ${datos.fecha || new Date().toLocaleDateString()}`,
-            tipo_evento: datos.tipo,
-            fecha_evento: datos.fecha || null,
-            num_personas: parseInt(datos.personas),
-            presupuesto_total: parseFloat(datos.presupuesto),
-            ciudad: datos.ciudad
+            usuario_id:        usuarioActual.id,
+            conversacion_id:   typeof conversacionId !== 'undefined' ? conversacionId : null,
+            nombre:            `${datos.tipo} - ${fechaISO}`,
+            tipo_evento:       datos.tipo,
+            fecha_evento:      fechaISO,
+            num_personas:      parseInt(datos.personas) || 1,
+            presupuesto_total: Number(datos.presupuesto) || 0,
+            ciudad:            datos.ciudad || 'Florencia'
         };
 
-        const btn = document.getElementById('floatingSaveBtn');
         if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...'; }
 
         try {
@@ -681,8 +863,10 @@
             const data = await response.json();
 
             if (response.ok && data.success) {
-                document.getElementById('saveButtonContainer').classList.add('hidden');
+                // Resetear estado del evento para una nueva planificación
+                estadoEvento = { tipo: null, presupuesto: null, personas: null, ciudad: null, fecha: null };
                 ultimosDatosEvento = null;
+                if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-save"></i> Guardar Evento'; btn.title = 'Evento guardado'; }
                 appendMessage('assistant', `✅ ¡Evento guardado exitosamente! Puedes verlo en <a href="/pages/mis-eventos.html" style="color:var(--green-dark);font-weight:600">Mis Eventos</a>`, true);
             } else {
                 alert('Error: ' + (data.error || 'Error desconocido al guardar el evento'));
@@ -775,6 +959,11 @@
         }
 
         if (typeof conversacionId === 'undefined' || !conversacionId) {
+            // Limpiar estado acumulado para que la nueva conversación
+            // arranque desde cero sin datos de sesiones anteriores
+            estadoEvento = { tipo: null, presupuesto: null, personas: null, ciudad: null, fecha: null };
+            ultimosDatosEvento = null;
+            refrescarBotonGuardar();
             await iniciarConversacion();
         }
 
@@ -807,11 +996,26 @@
 
             let respuesta = data.respuesta || 'Lo siento, no pude procesar tu solicitud.';
 
-            const datosExtraidos = extraerDatosParaGuardar(respuesta);
-            if (datosExtraidos) mostrarBotonGuardar(datosExtraidos);
+            // ── Alimentar estado con datos que el backend pudo extraer ──
+            const datosBackend = {};
+            if (data.tipo_evento)  datosBackend.tipo        = normalizarTipoEvento(data.tipo_evento);
+            if (data.presupuesto)  datosBackend.presupuesto = Number(data.presupuesto);
+            if (data.num_personas) datosBackend.personas    = parseInt(data.num_personas);
+            if (data.ciudad)       datosBackend.ciudad      = data.ciudad;
+            if (data.fecha)        datosBackend.fecha       = data.fecha;
+            if (Object.keys(datosBackend).length) actualizarEstadoEvento(datosBackend);
 
-            // Ocultar bloque de datos estructurado (no mostrar al usuario)
-            let respuestaLimpia = respuesta.replace(/---DATOS_EVENTO---[\s\S]*?---FIN_DATOS---/g, '').trim();
+            // ── Alimentar estado con datos del bloque ---DATOS_EVENTO--- ──
+            const datosBotRespuesta = extraerDatosParciales(respuesta);
+            if (Object.keys(datosBotRespuesta).length) actualizarEstadoEvento(datosBotRespuesta);
+
+            // Refrescar botón guardar con el estado acumulado
+            refrescarBotonGuardar();
+
+            // Quitar bloque estructurado antes de mostrar al usuario
+            const respuestaLimpia = respuesta
+                .replace(/---DATOS_EVENTO---[\s\S]*?---FIN_DATOS---/g, '')
+                .trim();
             let respuestaHTML = respuestaLimpia.replace(/\n/g, '<br>');
             respuestaHTML = respuestaHTML.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
 
@@ -863,7 +1067,7 @@
             
             authDiv.innerHTML = `
                 <div class="user-info">
-                    <div class="user-avatar">${usuarioActual.nombre ? usuarioActual.nombre.charAt(0).toUpperCase() : "U"}</div>
+                    <div class="user-avatar">${(usuarioActual && usuarioActual.nombre) ? usuarioActual.nombre.charAt(0).toUpperCase() : "U"}</div>
                     <span class="user-name" style="color: #1a1a2e; font-weight: 500;">${escapeHTML(usuarioActual.nombre)}</span>
                     <span class="user-role" style="background: ${rolColor}; color: white; padding: 3px 10px; border-radius: 50px; font-size: 0.7rem; font-weight: 600;">${usuarioActual.rol}</span>
                 </div>
@@ -876,6 +1080,71 @@
             `;
         }
     }
+
+
+    // ── RESET CHAT ──
+    function mostrarModalReset() {
+        document.getElementById('resetModalOverlay').classList.add('active');
+    }
+
+    function cerrarModalReset() {
+        document.getElementById('resetModalOverlay').classList.remove('active');
+    }
+
+    async function confirmarReset() {
+        cerrarModalReset();
+
+        // 1. Limpiar estado del frontend
+        estadoEvento = { tipo: null, presupuesto: null, personas: null, ciudad: null, fecha: null };
+        ultimosDatosEvento = null;
+        esperandoRespuestaIA = false;
+        refrescarBotonGuardar();
+
+        // 2. Resetear conversacionId para forzar nueva conversación en backend
+        //    IMPORTANTE: se usa window.conversacionId para afectar la variable
+        //    aunque esté declarada en api.js (distinto scope de script).
+        try {
+            const idActual = window.conversacionId;
+            if (idActual) {
+                await fetch(`${API_URL}/chatbot/conversacion/${idActual}/cerrar/`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+            }
+        } catch(e) { /* silencioso si el endpoint no existe */ }
+        window.conversacionId = null;
+
+        // 3. Limpiar mensajes del chat y restaurar mensaje de bienvenida
+        const chatMessages = document.getElementById('chatMessages');
+        chatMessages.innerHTML = `
+            <div class="msg-row assistant">
+                <div class="ai-avatar">✦</div>
+                <div class="bubble-wrap">
+                    <div class="bubble">
+                        ¡Hola! Soy tu asistente de flujo. Estoy listo para ayudarte a orquestar tu próximo evento. ¿Qué tienes en mente hoy?
+                        <div class="chips" id="initialChips">
+                            <div class="chip" onclick="enviarChip('Planificar Boda')"><i class="fas fa-rings-wedding"></i> Planificar Boda</div>
+                            <div class="chip" onclick="enviarChip('Evento Corporativo')"><i class="fas fa-briefcase"></i> Evento Corporativo</div>
+                            <div class="chip" onclick="enviarChip('Quinceañera')"><i class="fas fa-star"></i> Quinceañera</div>
+                            <div class="chip" onclick="enviarChip('Cumpleaños')"><i class="fas fa-birthday-cake"></i> Cumpleaños</div>
+                        </div>
+                    </div>
+                    <div class="bubble-meta">Flow AI • ${new Date().toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' })}</div>
+                </div>
+            </div>`;
+
+        // 4. Iniciar nueva conversación en el backend
+        if (typeof iniciarConversacion === 'function') {
+            await iniciarConversacion();
+        }
+
+        scrollToBottom();
+    }
+
+    // Cerrar modal al hacer clic fuera
+    document.getElementById('resetModalOverlay').addEventListener('click', function(e) {
+        if (e.target === this) cerrarModalReset();
+    });
 
     // ── INIT ──
     if (typeof usuarioActual === 'undefined' || !usuarioActual) {
