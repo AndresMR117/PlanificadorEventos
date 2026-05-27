@@ -67,16 +67,28 @@ class GroqService:
     }
 
     def __init__(self):
-        # === CARGA FORZADA DE LA API KEY ===
-        self.api_key = os.getenv('GROQ_API_KEY') or os.environ.get('GROQ_API_KEY')
+        # ── Carga de la API key ───────────────────────────────────
+        # Railway inyecta las variables directamente en os.environ;
+        # load_dotenv() las carga desde .env en desarrollo local.
+        # Ambos métodos son equivalentes; os.getenv es suficiente.
+        self.api_key = os.getenv('GROQ_API_KEY')
+
         if self.api_key:
-            print(f'[GROQ] API key cargada correctamente (primeros 10 chars): {self.api_key[:10]}...')
+            print(f'[GROQ] API key cargada correctamente '
+                  f'(primeros 10 chars): {self.api_key[:10]}...')
         else:
-            print('[GROQ] ERROR: GROQ_API_KEY no encontrada en el entorno')
-        
+            # Mostrar TODAS las variables disponibles para diagnóstico
+            vars_disponibles = [k for k in os.environ.keys()]
+            print(f'[GROQ] ERROR: GROQ_API_KEY no encontrada.')
+            print(f'[GROQ] Variables de entorno disponibles: {vars_disponibles}')
+            raise ValueError(
+                'GROQ_API_KEY no está configurada en las variables de entorno. '
+                'Verifica que esté definida en Railway → Variables.'
+            )
+
         self.client = OpenAI(
             api_key=self.api_key,
-            base_url='https://api.groq.com/openai/v1'
+            base_url='https://api.groq.com/openai/v1',
         )
         self.model = 'llama-3.1-8b-instant'
         self.sparql = SPARQLService()
@@ -522,5 +534,5 @@ FECHA: {fecha or '[YYYY-MM-DD]'}
             print(f'[GROQ ERROR] {e}')
             return (
                 f'❌ Error al conectar con Groq: {e}\n'
-                'Verifica que GROQ_API_KEY esté correctamente configurada en el archivo .env'
+                'Verifica que GROQ_API_KEY esté correctamente configurada en Railway → Variables.'
             )

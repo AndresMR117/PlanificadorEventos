@@ -8,9 +8,22 @@ import hashlib
 import re
 from django.utils import timezone
 
-# Inicializar servicios
-groq = GroqService()
-sparql = SPARQLService()
+# ── Inicialización lazy para evitar que falle el import del módulo
+#    si GROQ_API_KEY aún no está disponible al arrancar.
+_groq_service = None
+_sparql_service = None
+
+def get_groq():
+    global _groq_service
+    if _groq_service is None:
+        _groq_service = GroqService()
+    return _groq_service
+
+def get_sparql():
+    global _sparql_service
+    if _sparql_service is None:
+        _sparql_service = SPARQLService()
+    return _sparql_service
 
 
 # ==================== AUTENTICACIÓN (MySQL) ====================
@@ -87,37 +100,37 @@ def obtener_usuarios(request):
 
 @api_view(['GET'])
 def obtener_proveedores(request):
-    proveedores = sparql.obtener_proveedores()
+    proveedores = get_sparql().obtener_proveedores()
     return Response(proveedores)
 
 
 @api_view(['GET'])
 def proveedores_destacados(request):
-    proveedores = sparql.obtener_proveedores_destacados()
+    proveedores = get_sparql().obtener_proveedores_destacados()
     return Response(proveedores)
 
 
 @api_view(['GET'])
 def obtener_todos_proveedores(request):
-    proveedores = sparql.obtener_proveedores()
+    proveedores = get_sparql().obtener_proveedores()
     return Response(proveedores)
 
 
 @api_view(['GET'])
 def proveedor_por_nombre(request, nombre):
-    proveedores = sparql.obtener_proveedor_por_nombre(nombre)
+    proveedores = get_sparql().obtener_proveedor_por_nombre(nombre)
     return Response(proveedores)
 
 
 @api_view(['GET'])
 def proveedores_por_ciudad(request, ciudad):
-    proveedores = sparql.obtener_proveedores_por_ciudad(ciudad)
+    proveedores = get_sparql().obtener_proveedores_por_ciudad(ciudad)
     return Response(proveedores)
 
 
 @api_view(['GET'])
 def proveedores_por_categoria(request, categoria):
-    proveedores = sparql.obtener_proveedores_por_categoria(categoria)
+    proveedores = get_sparql().obtener_proveedores_por_categoria(categoria)
     return Response(proveedores)
 
 
@@ -125,7 +138,7 @@ def proveedores_por_categoria(request, categoria):
 
 @api_view(['GET'])
 def obtener_tipos_evento(request):
-    tipos = sparql.obtener_tipos_evento()
+    tipos = get_sparql().obtener_tipos_evento()
     return Response(tipos)
 
 
@@ -133,7 +146,7 @@ def obtener_tipos_evento(request):
 
 @api_view(['GET'])
 def obtener_categorias_servicio(request):
-    categorias = sparql.obtener_categorias_servicio()
+    categorias = get_sparql().obtener_categorias_servicio()
     return Response(categorias)
 
 
@@ -141,19 +154,19 @@ def obtener_categorias_servicio(request):
 
 @api_view(['GET'])
 def obtener_servicios(request):
-    servicios = sparql.obtener_servicios()
+    servicios = get_sparql().obtener_servicios()
     return Response(servicios)
 
 
 @api_view(['GET'])
 def servicios_por_tipo(request, tipo_evento):
-    servicios = sparql.obtener_servicios_por_tipo(tipo_evento)
+    servicios = get_sparql().obtener_servicios_por_tipo(tipo_evento)
     return Response(servicios)
 
 
 @api_view(['GET'])
 def servicios_por_categoria(request, categoria):
-    servicios = sparql.obtener_servicios_por_categoria(categoria)
+    servicios = get_sparql().obtener_servicios_por_categoria(categoria)
     return Response(servicios)
 
 
@@ -161,7 +174,7 @@ def servicios_por_categoria(request, categoria):
 def servicios_por_rango_precio(request):
     min_precio = request.query_params.get('min', 0)
     max_precio = request.query_params.get('max', 10000000)
-    servicios = sparql.obtener_servicios_por_rango_precio(float(min_precio), float(max_precio))
+    servicios = get_sparql().obtener_servicios_por_rango_precio(float(min_precio), float(max_precio))
     return Response(servicios)
 
 
@@ -169,13 +182,13 @@ def servicios_por_rango_precio(request):
 
 @api_view(['GET'])
 def obtener_paquetes(request):
-    paquetes = sparql.obtener_paquetes()
+    paquetes = get_sparql().obtener_paquetes()
     return Response(paquetes)
 
 
 @api_view(['GET'])
 def paquetes_por_tipo(request, tipo_evento):
-    paquetes = sparql.obtener_paquetes_por_tipo(tipo_evento)
+    paquetes = get_sparql().obtener_paquetes_por_tipo(tipo_evento)
     return Response(paquetes)
 
 
@@ -183,13 +196,13 @@ def paquetes_por_tipo(request, tipo_evento):
 
 @api_view(['GET'])
 def obtener_accesorios(request):
-    accesorios = sparql.obtener_accesorios()
+    accesorios = get_sparql().obtener_accesorios()
     return Response(accesorios)
 
 
 @api_view(['GET'])
 def accesorios_por_tipo(request, tipo_evento):
-    accesorios = sparql.obtener_accesorios_por_tipo(tipo_evento)
+    accesorios = get_sparql().obtener_accesorios_por_tipo(tipo_evento)
     return Response(accesorios)
 
 
@@ -197,7 +210,7 @@ def accesorios_por_tipo(request, tipo_evento):
 
 @api_view(['GET'])
 def obtener_ubicaciones(request):
-    ubicaciones = sparql.obtener_ubicaciones()
+    ubicaciones = get_sparql().obtener_ubicaciones()
     return Response(ubicaciones)
 
 
@@ -205,13 +218,13 @@ def obtener_ubicaciones(request):
 
 @api_view(['GET'])
 def obtener_factores_distancia(request):
-    factores = sparql.obtener_factores_distancia()
+    factores = get_sparql().obtener_factores_distancia()
     return Response(factores)
 
 
 @api_view(['GET'])
 def obtener_temporadas(request):
-    temporadas = sparql.obtener_temporadas()
+    temporadas = get_sparql().obtener_temporadas()
     return Response(temporadas)
 
 
@@ -226,7 +239,7 @@ def recomendaciones_completas(request):
     if presupuesto_max:
         presupuesto_max = float(presupuesto_max)
     
-    recomendaciones = sparql.generar_recomendaciones_completas(tipo_evento, presupuesto_max, ciudad)
+    recomendaciones = get_sparql().generar_recomendaciones_completas(tipo_evento, presupuesto_max, ciudad)
     return Response(recomendaciones)
 
 
@@ -234,7 +247,7 @@ def recomendaciones_completas(request):
 
 @api_view(['GET'])
 def obtener_proveedores_con_estadisticas(request):
-    proveedores = sparql.obtener_proveedores()
+    proveedores = get_sparql().obtener_proveedores()
     
     for p in proveedores:
         nombre = p.get('nombre', '')
@@ -290,7 +303,7 @@ def chat_con_groq(request):
         print(f"[DEBUG] Contexto construido: {contexto[:200]}...")
     
     # Obtener respuesta de la IA
-    respuesta_ia = groq.generar_respuesta(mensaje, contexto, usuario_id)
+    respuesta_ia = get_groq().generar_respuesta(mensaje, contexto, usuario_id)
     print(f"[DEBUG] Respuesta IA: {respuesta_ia[:100]}...")
     
     # Guardar en el historial
@@ -337,7 +350,7 @@ def enviar_mensaje(request, conversacion_id):
         contexto += f"{rol}: {msg.get('mensaje', '')}\n"
     
     # Obtener respuesta de la IA
-    respuesta_ia = groq.generar_respuesta(mensaje, contexto, conversacion.usuario.id)
+    respuesta_ia = get_groq().generar_respuesta(mensaje, contexto, conversacion.usuario.id)
     
     # Guardar en el historial
     historial.append({
@@ -620,8 +633,8 @@ def estadisticas_generales(request):
     total_usuarios = Usuario.objects.count()
     total_conversaciones = Conversacion.objects.count()
     total_eventos = Evento.objects.count()
-    proveedores = sparql.obtener_proveedores()
-    servicios = sparql.obtener_servicios()
+    proveedores = get_sparql().obtener_proveedores()
+    servicios = get_sparql().obtener_servicios()
     
     return Response({
         'total_usuarios': total_usuarios,
@@ -629,7 +642,7 @@ def estadisticas_generales(request):
         'total_eventos': total_eventos,
         'total_proveedores': len(proveedores),
         'total_servicios': len(servicios),
-        'proveedores_destacados': sparql.obtener_proveedores_destacados()[:3]
+        'proveedores_destacados': get_sparql().obtener_proveedores_destacados()[:3]
     })
 
 
@@ -641,19 +654,19 @@ def buscar_general(request):
         return Response({'error': 'Se requiere un término de búsqueda'}, status=400)
     
     resultados = {
-        'proveedores': sparql.obtener_proveedores_por_nombre(query),
+        'proveedores': get_sparql().obtener_proveedores_por_nombre(query),
         'servicios': [],
         'paquetes': []
     }
     
-    tipos = sparql.obtener_tipos_evento()
+    tipos = get_sparql().obtener_tipos_evento()
     for tipo in tipos:
-        servicios = sparql.obtener_servicios_por_tipo(tipo.get('nombre'))
+        servicios = get_sparql().obtener_servicios_por_tipo(tipo.get('nombre'))
         for s in servicios:
             if query.lower() in s.get('nombre', '').lower():
                 resultados['servicios'].append(s)
     
-    paquetes = sparql.obtener_paquetes()
+    paquetes = get_sparql().obtener_paquetes()
     for p in paquetes:
         if query.lower() in p.get('nombre', '').lower():
             resultados['paquetes'].append(p)
