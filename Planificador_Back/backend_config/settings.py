@@ -123,3 +123,15 @@ LOGGING = {
         },
     },
 }
+
+# DIAGNÓSTICO TEMPORAL - eliminar después
+print("=== MYSQL CONFIG ===")
+print(f"MYSQL_HOST     = {os.getenv('MYSQL_HOST', 'NO DEFINIDA')}")
+print(f"MYSQL_PORT     = {os.getenv('MYSQL_PORT', 'NO DEFINIDA')}")
+print(f"MYSQL_USER     = {os.getenv('MYSQL_USER', 'NO DEFINIDA')}")
+print(f"MYSQL_DATABASE = {os.getenv('MYSQL_DATABASE', 'NO DEFINIDA')}")
+print(f"MYSQLHOST      = {os.getenv('MYSQLHOST', 'NO DEFINIDA')}")
+print(f"MYSQLPORT      = {os.getenv('MYSQLPORT', 'NO DEFINIDA')}")
+print(f"MYSQLUSER      = {os.getenv('MYSQLUSER', 'NO DEFINIDA')}")
+print(f"MYSQLDATABASE  = {os.getenv('MYSQLDATABASE', 'NO DEFINIDA')}")
+print("====================")
