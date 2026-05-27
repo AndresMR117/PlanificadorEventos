@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+from urllib.parse import urlparse
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -53,17 +54,33 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'backend_config.wsgi.application'
 
-# ── MySQL: acepta tanto MYSQL_HOST (manual) como MYSQLHOST (Railway auto) ──
+def mysql_url_config():
+    mysql_url = os.getenv('MYSQL_PUBLIC_URL') or os.getenv('MYSQL_URL')
+    if not mysql_url:
+        return {}
+
+    parsed = urlparse(mysql_url)
+    return {
+        'NAME': parsed.path.lstrip('/') or os.getenv('MYSQLDATABASE', 'planificador_eventos'),
+        'USER': parsed.username or os.getenv('MYSQLUSER', 'root'),
+        'PASSWORD': parsed.password or os.getenv('MYSQLPASSWORD', ''),
+        'HOST': parsed.hostname or os.getenv('MYSQLHOST', 'localhost'),
+        'PORT': str(parsed.port or os.getenv('MYSQLPORT', '3306')),
+    }
+
+
+mysql_from_url = mysql_url_config()
+
+# MySQL: acepta variables locales, Railway y URLs de conexion.
 DATABASES = {
     'default': {
         'ENGINE':   'django.db.backends.mysql',
-        'NAME':     os.getenv('MYSQL_DATABASE') or os.getenv('MYSQLDATABASE', 'planificador_eventos'),
-        'USER':     os.getenv('MYSQL_USER')     or os.getenv('MYSQLUSER', 'root'),
-        'PASSWORD': os.getenv('MYSQL_PASSWORD') or os.getenv('MYSQLPASSWORD', ''),
-        'HOST':     os.getenv('MYSQL_HOST')     or os.getenv('MYSQLHOST', 'localhost'),
-        'PORT':     os.getenv('MYSQL_PORT')     or os.getenv('MYSQLPORT', '3306'),
+        'NAME':     os.getenv('MYSQL_DATABASE') or mysql_from_url.get('NAME') or os.getenv('MYSQLDATABASE', 'planificador_eventos'),
+        'USER':     os.getenv('MYSQL_USER')     or mysql_from_url.get('USER') or os.getenv('MYSQLUSER', 'root'),
+        'PASSWORD': os.getenv('MYSQL_PASSWORD') or mysql_from_url.get('PASSWORD') or os.getenv('MYSQLPASSWORD', ''),
+        'HOST':     os.getenv('MYSQL_HOST')     or mysql_from_url.get('HOST') or os.getenv('MYSQLHOST', 'localhost'),
+        'PORT':     os.getenv('MYSQL_PORT')     or mysql_from_url.get('PORT') or os.getenv('MYSQLPORT', '3306'),
         'OPTIONS': {
-            'ssl': {'ca': None},
             'connect_timeout': 10,
         },
     }
@@ -91,7 +108,7 @@ REST_FRAMEWORK = {
     ],
 }
 
-SPARQL_ENDPOINT = os.getenv('SPARQL_ENDPOINT', 'https://fuseki-copy-production.up.railway.app/eventos/sparql')
+SPARQL_ENDPOINT = os.getenv('SPARQL_ENDPOINT', '')
 SPARQL_USER     = os.getenv('SPARQL_USER', 'admin')
 SPARQL_PASSWORD = os.getenv('SPARQL_PASSWORD', '')
 
@@ -124,14 +141,3 @@ LOGGING = {
     },
 }
 
-# DIAGNÓSTICO TEMPORAL - eliminar después
-print("=== MYSQL CONFIG ===")
-print(f"MYSQL_HOST     = {os.getenv('MYSQL_HOST', 'NO DEFINIDA')}")
-print(f"MYSQL_PORT     = {os.getenv('MYSQL_PORT', 'NO DEFINIDA')}")
-print(f"MYSQL_USER     = {os.getenv('MYSQL_USER', 'NO DEFINIDA')}")
-print(f"MYSQL_DATABASE = {os.getenv('MYSQL_DATABASE', 'NO DEFINIDA')}")
-print(f"MYSQLHOST      = {os.getenv('MYSQLHOST', 'NO DEFINIDA')}")
-print(f"MYSQLPORT      = {os.getenv('MYSQLPORT', 'NO DEFINIDA')}")
-print(f"MYSQLUSER      = {os.getenv('MYSQLUSER', 'NO DEFINIDA')}")
-print(f"MYSQLDATABASE  = {os.getenv('MYSQLDATABASE', 'NO DEFINIDA')}")
-print("====================")

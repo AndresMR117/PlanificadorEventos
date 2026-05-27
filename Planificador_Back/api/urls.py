@@ -4,8 +4,10 @@ from . import views
 urlpatterns = [
     # Auth (MySQL)
     path('registro/', views.registro, name='registro'),
+    path('register/', views.registro, name='register'),
     path('login/', views.login, name='login'),
     path('usuarios/', views.obtener_usuarios, name='usuarios'),
+    path('sparql/status/', views.estado_sparql, name='estado_sparql'),
     
     # Proveedores (SPARQL)
     path('proveedores/', views.obtener_proveedores, name='proveedores'),

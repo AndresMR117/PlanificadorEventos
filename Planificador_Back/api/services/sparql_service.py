@@ -4,16 +4,23 @@ from typing import List, Dict
 
 class SPARQLService:
     def __init__(self):
-        # Leer endpoint desde variable de entorno o usar el de Railway por defecto
-        self.endpoint = os.getenv('SPARQL_ENDPOINT', 'https://fuseki-copy-production.up.railway.app/eventos/sparql')
-        print(f"[SPARQL] Usando endpoint: {self.endpoint}")
+        self.endpoint = os.getenv('SPARQL_ENDPOINT', '').strip()
+        self.user = os.getenv('SPARQL_USER', '').strip()
+        self.password = os.getenv('SPARQL_PASSWORD', '').strip()
+        self.timeout = int(os.getenv('SPARQL_TIMEOUT', '10'))
     
     def query(self, query_string: str) -> List[Dict]:
+        if not self.endpoint:
+            return []
+
         try:
+            auth = (self.user, self.password) if self.user and self.password else None
             response = requests.post(
                 self.endpoint,
                 data={'query': query_string},
-                headers={'Accept': 'application/json'}
+                headers={'Accept': 'application/json'},
+                auth=auth,
+                timeout=self.timeout,
             )
             if response.status_code == 200:
                 return self._parse_results(response.json())

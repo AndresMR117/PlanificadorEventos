@@ -5,6 +5,7 @@ from .models import Usuario, Conversacion, Evento
 from .services.sparql_service import SPARQLService
 from .services.groq_service import GroqService
 import hashlib
+import os
 import re
 from django.utils import timezone
 
@@ -97,6 +98,16 @@ def obtener_usuarios(request):
 
 
 # ==================== PROVEEDORES (SPARQL) ====================
+
+@api_view(['GET'])
+def estado_sparql(request):
+    endpoint = os.getenv('SPARQL_ENDPOINT', '').strip()
+    return Response({
+        'configured': bool(endpoint),
+        'endpoint': endpoint if endpoint else None,
+        'message': 'SPARQL listo para consultar' if endpoint else 'SPARQL_ENDPOINT no configurado todavia',
+    })
+
 
 @api_view(['GET'])
 def obtener_proveedores(request):
@@ -303,8 +314,11 @@ def chat_con_groq(request):
         print(f"[DEBUG] Contexto construido: {contexto[:200]}...")
     
     # Obtener respuesta de la IA
-    respuesta_ia = get_groq().generar_respuesta(mensaje, contexto, usuario_id)
+    groq = get_groq()
+    respuesta_ia = groq.generar_respuesta(mensaje, contexto, usuario_id)
     print(f"[DEBUG] Respuesta IA: {respuesta_ia[:100]}...")
+
+    estado_extraido = groq.extraer_estado(f"{contexto}\nUsuario: {mensaje}\nAsistente: {respuesta_ia}")
     
     # Guardar en el historial
     if conversacion:
@@ -323,7 +337,22 @@ def chat_con_groq(request):
         conversacion.updated_at = timezone.now()
         conversacion.save()
     
-    return Response({'respuesta': respuesta_ia})
+    return Response({
+        'respuesta': respuesta_ia,
+        'conversacion_id': conversacion.id if conversacion else None,
+        'tipo_evento': estado_extraido.get('tipo_django'),
+        'num_personas': estado_extraido.get('personas'),
+        'presupuesto': estado_extraido.get('presupuesto'),
+        'ciudad': estado_extraido.get('ciudad'),
+        'fecha': estado_extraido.get('fecha'),
+        'datos_completos': all([
+            estado_extraido.get('tipo_django'),
+            estado_extraido.get('personas'),
+            estado_extraido.get('presupuesto'),
+            estado_extraido.get('ciudad'),
+            estado_extraido.get('fecha'),
+        ]),
+    })
 
 
 # ==================== ENVIAR MENSAJE (para conversaciones existentes) ====================

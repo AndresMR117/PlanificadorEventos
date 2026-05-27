@@ -18,14 +18,25 @@ class ApiService {
     defaultValue: 'http://10.0.2.2:8000/api',
   );
 
+  static Map<String, dynamic>? currentUser;
+
+  static int? get currentUserId {
+    final id = currentUser?['id'];
+    if (id is int) return id;
+    if (id is String) return int.tryParse(id);
+    return null;
+  }
+
   static Future<Map<String, dynamic>> login(
     String email,
     String password,
   ) async {
-    return _post('/login', {
+    final user = await _post('/login/', {
       'email': email,
       'password': password,
     });
+    currentUser = user;
+    return user;
   }
 
   static Future<Map<String, dynamic>> register({
@@ -33,10 +44,73 @@ class ApiService {
     required String email,
     required String password,
   }) async {
-    return _post('/register', {
+    return _post('/registro/', {
       'nombre': nombre,
       'email': email,
       'password': password,
+    });
+  }
+
+  static Future<List<Map<String, dynamic>>> getEventosUsuario(int usuarioId) {
+    return _getList('/eventos/usuario/$usuarioId/');
+  }
+
+  static Future<Map<String, dynamic>> getEvento(int eventoId) {
+    return _get('/eventos/$eventoId/');
+  }
+
+  static Future<List<Map<String, dynamic>>> getTiposEvento() {
+    return _getList('/tipos-evento/');
+  }
+
+  static Future<List<Map<String, dynamic>>> getServiciosPorTipo(String tipo) {
+    return _getList('/servicios/tipo/${Uri.encodeComponent(tipo)}/');
+  }
+
+  static Future<List<Map<String, dynamic>>> getProveedoresDestacados() {
+    return _getList('/proveedores/destacados/');
+  }
+
+  static Future<Map<String, dynamic>> crearConversacion({
+    required int usuarioId,
+    String titulo = 'Chat con IA',
+  }) {
+    return _post('/conversaciones/crear/', {
+      'usuario_id': usuarioId,
+      'titulo': titulo,
+    });
+  }
+
+  static Future<Map<String, dynamic>> enviarChat({
+    required String mensaje,
+    int? conversacionId,
+  }) {
+    return _post('/chatbot/groq/', {
+      'mensaje': mensaje,
+      'usuario_id': currentUserId,
+      if (conversacionId != null) 'conversacion_id': conversacionId,
+    });
+  }
+
+  static Future<Map<String, dynamic>> guardarEvento({
+    required int usuarioId,
+    int? conversacionId,
+    required String nombre,
+    required String tipoEvento,
+    required String fechaEvento,
+    required int numPersonas,
+    required num presupuestoTotal,
+    required String ciudad,
+  }) {
+    return _post('/eventos/guardar/', {
+      'usuario_id': usuarioId,
+      'conversacion_id': conversacionId,
+      'nombre': nombre,
+      'tipo_evento': tipoEvento,
+      'fecha_evento': fechaEvento,
+      'num_personas': numPersonas,
+      'presupuesto_total': presupuestoTotal,
+      'ciudad': ciudad,
     });
   }
 
@@ -60,6 +134,57 @@ class ApiService {
     if (response.statusCode >= 200 && response.statusCode < 300) {
       return data;
     }
+
+    throw ApiException(
+      _extractMessage(data),
+      statusCode: response.statusCode,
+    );
+  }
+
+  static Future<Map<String, dynamic>> _get(String path) async {
+    final uri = Uri.parse('$baseUrl$path');
+
+    final response = await http.get(
+      uri,
+      headers: const {'Accept': 'application/json'},
+    );
+
+    final data = _decodeResponse(response.body);
+
+    if (response.statusCode >= 200 && response.statusCode < 300) {
+      return data;
+    }
+
+    throw ApiException(
+      _extractMessage(data),
+      statusCode: response.statusCode,
+    );
+  }
+
+  static Future<List<Map<String, dynamic>>> _getList(String path) async {
+    final uri = Uri.parse('$baseUrl$path');
+
+    final response = await http.get(
+      uri,
+      headers: const {'Accept': 'application/json'},
+    );
+
+    final decoded = response.body.isEmpty ? [] : jsonDecode(response.body);
+
+    if (response.statusCode >= 200 && response.statusCode < 300) {
+      if (decoded is List) {
+        return decoded
+            .whereType<Map>()
+            .map((item) => Map<String, dynamic>.from(item))
+            .toList();
+      }
+
+      throw const ApiException('La respuesta del servidor no es una lista');
+    }
+
+    final data = decoded is Map
+        ? Map<String, dynamic>.from(decoded)
+        : <String, dynamic>{};
 
     throw ApiException(
       _extractMessage(data),
