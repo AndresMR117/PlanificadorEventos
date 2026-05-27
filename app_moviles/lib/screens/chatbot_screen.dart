@@ -31,7 +31,7 @@ class _ChatbotPageState extends State<ChatbotPage> {
       'message':
           'Hola. Soy tu asistente de Flow Events. Estoy listo para ayudarte a organizar tu proximo evento.',
       'time': 'Ahora',
-    }
+    },
   ];
 
   @override
@@ -138,10 +138,17 @@ class _ChatbotPageState extends State<ChatbotPage> {
   }
 
   bool get eventoCompleto {
-    return estadoEvento['tipo'] != null &&
+    final completo =
+        estadoEvento['tipo'] != null &&
         estadoEvento['presupuesto'] != null &&
         estadoEvento['personas'] != null &&
         estadoEvento['ciudad'] != null;
+
+    debugPrint('EVENTO COMPLETO => $completo');
+
+    debugPrint('ESTADO ACTUAL => $estadoEvento');
+
+    return completo;
   }
 
   int? parseNumero(dynamic value) {
@@ -157,7 +164,9 @@ class _ChatbotPageState extends State<ChatbotPage> {
 
   String? normalizarTipoEvento(String? tipo) {
     if (tipo == null || tipo.trim().isEmpty) return null;
-    final t = tipo.toLowerCase().trim()
+    final t = tipo
+        .toLowerCase()
+        .trim()
         .replaceAll('á', 'a')
         .replaceAll('é', 'e')
         .replaceAll('í', 'i')
@@ -177,8 +186,15 @@ class _ChatbotPageState extends State<ChatbotPage> {
     return tipo.trim();
   }
 
+  // SOLO reemplaza la función extraerDatosParciales por esta versión
+
   Map<String, dynamic> extraerDatosParciales(String respuesta) {
     final datos = <String, dynamic>{};
+
+    // =====================================================
+    // BLOQUE ESTRUCTURADO
+    // =====================================================
+
     final bloque = RegExp(
       r'---DATOS_EVENTO---([\s\S]*?)---FIN_DATOS---',
       caseSensitive: false,
@@ -186,23 +202,161 @@ class _ChatbotPageState extends State<ChatbotPage> {
 
     if (bloque != null) {
       final contenido = bloque.group(1) ?? '';
+
       String? getCampo(String campo) {
-        final match =
-            RegExp('$campo:\\s*(.+)', caseSensitive: false).firstMatch(contenido);
+        final match = RegExp(
+          '$campo:\\s*(.+)',
+          caseSensitive: false,
+        ).firstMatch(contenido);
+
         return match?.group(1)?.trim();
       }
 
-      datos['tipo'] = normalizarTipoEvento(getCampo('TIPO'));
-      datos['presupuesto'] = parseNumero(getCampo('PRESUPUESTO'));
-      datos['personas'] = parseNumero(getCampo('PERSONAS'));
-      datos['ciudad'] = getCampo('CIUDAD');
-      final fecha = getCampo('FECHA');
-      if (fecha != null && RegExp(r'^\d{4}-\d{2}-\d{2}$').hasMatch(fecha)) {
-        datos['fecha'] = fecha;
+      final tipoRaw = getCampo('TIPO');
+
+      final presupuestoRaw = (getCampo('PRESUPUESTO') ?? '').replaceAll(
+        RegExp(r'[^0-9]'),
+        '',
+      );
+
+      final personasRaw = (getCampo('PERSONAS') ?? '').replaceAll(
+        RegExp(r'[^0-9]'),
+        '',
+      );
+
+      final ciudadRaw = getCampo('CIUDAD');
+
+      final fechaRaw = getCampo('FECHA');
+
+      // TIPO
+      if (tipoRaw != null && tipoRaw.isNotEmpty && !tipoRaw.contains('[')) {
+        datos['tipo'] = normalizarTipoEvento(tipoRaw);
+      }
+
+      // PRESUPUESTO
+      if (presupuestoRaw.isNotEmpty) {
+        final valor = int.tryParse(presupuestoRaw);
+
+        if (valor != null && valor > 0) {
+          datos['presupuesto'] = valor;
+        }
+      }
+
+      // PERSONAS
+      if (personasRaw.isNotEmpty) {
+        final valor = int.tryParse(personasRaw);
+
+        if (valor != null && valor > 0) {
+          datos['personas'] = valor;
+        }
+      }
+
+      // CIUDAD
+      if (ciudadRaw != null &&
+          ciudadRaw.isNotEmpty &&
+          !ciudadRaw.contains('[')) {
+        datos['ciudad'] = ciudadRaw;
+      }
+
+      // FECHA
+      if (fechaRaw != null &&
+          RegExp(r'^\d{4}-\d{2}-\d{2}$').hasMatch(fechaRaw)) {
+        datos['fecha'] = fechaRaw;
       }
     }
 
+    // =====================================================
+    // HEURÍSTICA INTELIGENTE
+    // =====================================================
+
+    // Tipo evento
+    if (datos['tipo'] == null) {
+      final match = RegExp(
+        r'(boda|cumpleaños|cumpleanos|grado|quinceañera|quinceanera|baby shower|evento corporativo|corporativo)',
+        caseSensitive: false,
+      ).firstMatch(respuesta);
+
+      if (match != null) {
+        datos['tipo'] = normalizarTipoEvento(match.group(1));
+      }
+    }
+
+    // Presupuesto
+    if (datos['presupuesto'] == null) {
+      final match = RegExp(
+        r'(\$?\s?\d[\d.,]{3,})',
+        caseSensitive: false,
+      ).firstMatch(respuesta);
+
+      if (match != null) {
+        final limpio = match.group(1)!.replaceAll(RegExp(r'[^0-9]'), '');
+
+        final valor = int.tryParse(limpio);
+
+        if (valor != null && valor > 1000) {
+          datos['presupuesto'] = valor;
+        }
+      }
+    }
+
+    // Personas
+    if (datos['personas'] == null) {
+      final match = RegExp(
+        r'(\d+)\s*(personas|invitados)',
+        caseSensitive: false,
+      ).firstMatch(respuesta);
+
+      if (match != null) {
+        final valor = int.tryParse(match.group(1)!);
+
+        if (valor != null && valor > 0) {
+          datos['personas'] = valor;
+        }
+      }
+    }
+
+    // Ciudad
+    if (datos['ciudad'] == null) {
+      final ciudades = [
+        'florencia',
+        'neiva',
+        'bogota',
+        'medellin',
+        'cali',
+        'cartagena',
+        'barranquilla',
+        'villavicencio',
+        'ibague',
+      ];
+
+      for (final ciudad in ciudades) {
+        if (respuesta.toLowerCase().contains(ciudad)) {
+          datos['ciudad'] = ciudad;
+          break;
+        }
+      }
+    }
+
+    // Fecha
+    if (datos['fecha'] == null) {
+      final match = RegExp(
+        r'(\d{4}-\d{2}-\d{2})',
+        caseSensitive: false,
+      ).firstMatch(respuesta);
+
+      if (match != null) {
+        datos['fecha'] = match.group(1);
+      }
+    }
+
+    // =====================================================
+    // LIMPIEZA
+    // =====================================================
+
     datos.removeWhere((_, value) => value == null || value == '');
+
+    debugPrint('DATOS EXTRAIDOS => $datos');
+
     return datos;
   }
 
@@ -221,8 +375,13 @@ class _ChatbotPageState extends State<ChatbotPage> {
       saving = true;
     });
 
-    final fecha = estadoEvento['fecha']?.toString() ??
-        DateTime.now().add(const Duration(days: 90)).toIso8601String().split('T').first;
+    final fecha =
+        estadoEvento['fecha']?.toString() ??
+        DateTime.now()
+            .add(const Duration(days: 90))
+            .toIso8601String()
+            .split('T')
+            .first;
     final tipo = estadoEvento['tipo'].toString();
 
     try {
@@ -240,7 +399,8 @@ class _ChatbotPageState extends State<ChatbotPage> {
       setState(() {
         messages.add({
           'role': 'assistant',
-          'message': 'Evento guardado exitosamente. Ya puedes verlo en Mis Eventos.',
+          'message':
+              'Evento guardado exitosamente. Ya puedes verlo en Mis Eventos.',
           'time': getTime(),
         });
         estadoEvento = {
@@ -291,7 +451,9 @@ class _ChatbotPageState extends State<ChatbotPage> {
       padding: const EdgeInsets.only(bottom: 22),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
+        mainAxisAlignment: isUser
+            ? MainAxisAlignment.end
+            : MainAxisAlignment.start,
         children: [
           if (!isUser)
             Container(
@@ -302,15 +464,23 @@ class _ChatbotPageState extends State<ChatbotPage> {
                 color: const Color(0xFF2ECC71),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: const Icon(Icons.auto_awesome, color: Colors.white, size: 18),
+              child: const Icon(
+                Icons.auto_awesome,
+                color: Colors.white,
+                size: 18,
+              ),
             ),
           Flexible(
             child: Column(
-              crossAxisAlignment:
-                  isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+              crossAxisAlignment: isUser
+                  ? CrossAxisAlignment.end
+                  : CrossAxisAlignment.start,
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 18,
+                    vertical: 14,
+                  ),
                   decoration: BoxDecoration(
                     color: isUser ? const Color(0xFF2563EB) : Colors.white,
                     borderRadius: BorderRadius.only(
@@ -326,7 +496,7 @@ class _ChatbotPageState extends State<ChatbotPage> {
                               color: Colors.black.withOpacity(0.05),
                               blurRadius: 10,
                               offset: const Offset(0, 4),
-                            )
+                            ),
                           ],
                   ),
                   child: Text(
@@ -371,7 +541,10 @@ class _ChatbotPageState extends State<ChatbotPage> {
           children: [
             Icon(icon, size: 16, color: const Color(0xFF6B7280)),
             const SizedBox(width: 8),
-            Text(text, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500)),
+            Text(
+              text,
+              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
+            ),
           ],
         ),
       ),
@@ -400,7 +573,10 @@ class _ChatbotPageState extends State<ChatbotPage> {
         elevation: 0,
         backgroundColor: const Color(0xFFF0F2F0),
         foregroundColor: const Color(0xFF1A1A2E),
-        title: const Text('Crear Evento', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text(
+          'Crear Evento',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
       ),
       body: Column(
         children: [
@@ -435,7 +611,9 @@ class _ChatbotPageState extends State<ChatbotPage> {
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton.icon(
-                      onPressed: eventoCompleto && !saving ? guardarEvento : null,
+                      onPressed: eventoCompleto && !saving
+                          ? guardarEvento
+                          : null,
                       icon: saving
                           ? const SizedBox(
                               width: 18,
@@ -462,7 +640,10 @@ class _ChatbotPageState extends State<ChatbotPage> {
                   ),
                   const SizedBox(height: 10),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 8,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(18),
@@ -483,7 +664,8 @@ class _ChatbotPageState extends State<ChatbotPage> {
                             maxLines: 5,
                             decoration: const InputDecoration(
                               border: InputBorder.none,
-                              hintText: 'Escribe el tipo de evento o una idea...',
+                              hintText:
+                                  'Escribe el tipo de evento o una idea...',
                               hintStyle: TextStyle(color: Color(0xFF6B7280)),
                             ),
                             onSubmitted: (_) => sendMessage(),
@@ -498,7 +680,7 @@ class _ChatbotPageState extends State<ChatbotPage> {
                             onPressed: isTyping ? null : sendMessage,
                             icon: const Icon(Icons.send, color: Colors.white),
                           ),
-                        )
+                        ),
                       ],
                     ),
                   ),
