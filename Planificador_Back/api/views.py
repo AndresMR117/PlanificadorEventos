@@ -672,3 +672,14 @@ def buscar_general(request):
             resultados['paquetes'].append(p)
     
     return Response(resultados)
+
+from django.http import JsonResponse
+from .models import Evento  # Asumiendo que tienes el modelo Evento
+from django.views.decorators.csrf import csrf_exempt
+import json
+
+@csrf_exempt
+def obtener_todos_eventos(request):
+    if request.method == 'GET':
+        eventos = Evento.objects.all().values()
+        return JsonResponse(list(eventos), safe=False)

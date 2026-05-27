@@ -61,6 +61,7 @@ urlpatterns = [
     path('eventos/<int:evento_id>/', views.obtener_evento, name='obtener_evento'),
     path('eventos/<int:evento_id>/actualizar/', views.actualizar_evento, name='actualizar_evento'),
     path('eventos/<int:evento_id>/eliminar/', views.eliminar_evento, name='eliminar_evento'),
+    path('eventos/', views.obtener_todos_eventos, name='todos_eventos'),
     
     # Nuevos endpoints generales
     path('estadisticas/', views.estadisticas_generales, name='estadisticas'),
