@@ -2,6 +2,7 @@ FROM stain/jena-fuseki
 
 RUN mkdir -p /fuseki/databases
 RUN mkdir -p /fuseki/templates
+RUN mkdir -p /fuseki/backups
 
 RUN chmod -R 777 /fuseki
 
