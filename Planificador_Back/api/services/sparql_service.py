@@ -23,7 +23,7 @@ class SPARQLService:
                 timeout=self.timeout,
             )
             if response.status_code == 200:
-                return self._parse_results(response.json())
+                return response.json()
             return [{"status": response.status_code, "text": response.text}]
         except Exception as e:
             return [{"error": str(e)}]
