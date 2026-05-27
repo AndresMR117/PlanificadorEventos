@@ -1,5 +1,6 @@
 import os
 import requests
+import json
 from typing import List, Dict
 
 class SPARQLService:
@@ -21,7 +22,7 @@ class SPARQLService:
         )
 
             if response.status_code == 200:
-                data = response.json()
+                data = json.loads(response.text)
                 return self._parse_results(data)
 
             return [{
