@@ -11,20 +11,24 @@ class SPARQLService:
     
     def query(self, query_string: str) -> List[Dict]:
         if not self.endpoint:
-            return []
+            return [{"error": "SPARQL_ENDPOINT no configurado"}]
 
         try:
-            auth = (self.user, self.password) if self.user and self.password else None
             response = requests.get(
                 self.endpoint,
                 params={'query': query_string},
-                headers={'Accept': 'application/json'},
-                auth=auth,
                 timeout=self.timeout,
-            )
+        )
+
             if response.status_code == 200:
-                return self._parse_results(response.json())
-            return [{"status": response.status_code, "text": response.text}]
+                data = response.json()
+                return self._parse_results(data)
+
+            return [{
+                "status": response.status_code,
+                "text": response.text
+            }]
+
         except Exception as e:
             return [{"error": str(e)}]
     
@@ -42,52 +46,41 @@ class SPARQLService:
     def obtener_proveedores(self) -> List[Dict]:
         query = """
         PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-        PREFIX ev:  <http://eventos.caqueta.co/ontologia#>
-        PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
-        
-        SELECT DISTINCT ?nombre ?calificacion ?ciudad ?telefono ?whatsapp ?instagram WHERE {
+        PREFIX ev: <http://eventos.caqueta.co/ontologia#>
+
+        SELECT DISTINCT ?nombre WHERE {
             ?empresa rdf:type ev:Empresa .
             ?empresa ev:nombre ?nombre .
-            OPTIONAL { ?empresa ev:calificacion ?calificacion }
-            OPTIONAL { ?empresa ev:ciudad      ?ciudad      }
-            OPTIONAL { ?empresa ev:telefono    ?telefono    }
-            OPTIONAL { ?empresa ev:whatsapp    ?whatsapp    }
-            OPTIONAL { ?empresa ev:instagram   ?instagram   }
         }
+        LIMIT 50
         """
         return self.query(query)
     
     def obtener_proveedores_destacados(self) -> List[Dict]:
         query = """
         PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-        PREFIX ev:  <http://eventos.caqueta.co/ontologia#>
-        PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
-        
-        SELECT DISTINCT ?nombre ?calificacion ?ciudad ?telefono WHERE {
+        PREFIX ev: <http://eventos.caqueta.co/ontologia#>
+
+        SELECT DISTINCT ?nombre ?calificacion WHERE {
             ?empresa rdf:type ev:Empresa .
-            ?empresa ev:nombre       ?nombre       .
-            ?empresa ev:calificacion ?calificacion .
-            OPTIONAL { ?empresa ev:ciudad   ?ciudad   }
-            OPTIONAL { ?empresa ev:telefono ?telefono }
+            ?empresa ev:nombre ?nombre .
+            OPTIONAL { ?empresa ev:calificacion ?calificacion }
         }
-        ORDER BY DESC(xsd:decimal(?calificacion))
+        LIMIT 20
         """
         return self.query(query)
     
     def obtener_todos_proveedores(self) -> List[Dict]:
         query = """
         PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-        PREFIX ev:  <http://eventos.caqueta.co/ontologia#>
-        PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
-        
-        SELECT DISTINCT ?nombre ?calificacion ?ciudad ?telefono WHERE {
+        PREFIX ev: <http://eventos.caqueta.co/ontologia#>
+
+        SELECT DISTINCT ?nombre ?calificacion WHERE {
             ?empresa rdf:type ev:Empresa .
             ?empresa ev:nombre ?nombre .
             OPTIONAL { ?empresa ev:calificacion ?calificacion }
-            OPTIONAL { ?empresa ev:ciudad       ?ciudad       }
-            OPTIONAL { ?empresa ev:telefono     ?telefono     }
         }
-        ORDER BY DESC(xsd:decimal(?calificacion))
+        LIMIT 50
         """
         return self.query(query)
     
@@ -121,7 +114,6 @@ class SPARQLService:
             OPTIONAL {{ ?empresa ev:calificacion ?calificacion }}
             OPTIONAL {{ ?empresa ev:telefono     ?telefono     }}
         }}
-        ORDER BY DESC(xsd:decimal(?calificacion))
         """
         return self.query(query)
     
@@ -140,7 +132,6 @@ class SPARQLService:
             OPTIONAL {{ ?empresa ev:calificacion ?calificacion }}
             OPTIONAL {{ ?empresa ev:ciudad ?ciudad }}
         }}
-        ORDER BY DESC(xsd:decimal(?calificacion))
         """
         return self.query(query)
     
