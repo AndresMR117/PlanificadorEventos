@@ -53,14 +53,15 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'backend_config.wsgi.application'
 
+# ── MySQL: acepta tanto MYSQL_HOST (manual) como MYSQLHOST (Railway auto) ──
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.getenv('MYSQL_DATABASE', 'planificador_eventos'),
-        'USER': os.getenv('MYSQL_USER', 'root'),
-        'PASSWORD': os.getenv('MYSQL_PASSWORD'),
-        'HOST': os.getenv('MYSQL_HOST', 'zephyr.proxy.rlwy.net'),
-        'PORT': os.getenv('MYSQL_PORT', '24799'),
+        'ENGINE':   'django.db.backends.mysql',
+        'NAME':     os.getenv('MYSQL_DATABASE') or os.getenv('MYSQLDATABASE', 'planificador_eventos'),
+        'USER':     os.getenv('MYSQL_USER')     or os.getenv('MYSQLUSER', 'root'),
+        'PASSWORD': os.getenv('MYSQL_PASSWORD') or os.getenv('MYSQLPASSWORD', ''),
+        'HOST':     os.getenv('MYSQL_HOST')     or os.getenv('MYSQLHOST', 'localhost'),
+        'PORT':     os.getenv('MYSQL_PORT')     or os.getenv('MYSQLPORT', '3306'),
         'OPTIONS': {
             'ssl': {'ca': None},
             'connect_timeout': 10,
@@ -76,10 +77,10 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 LANGUAGE_CODE = 'es-co'
-TIME_ZONE = 'America/Bogota'
-USE_I18N = True
-USE_TZ = True
-STATIC_URL = 'static/'
+TIME_ZONE     = 'America/Bogota'
+USE_I18N      = True
+USE_TZ        = True
+STATIC_URL    = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CORS_ALLOW_ALL_ORIGINS = True
@@ -94,14 +95,11 @@ SPARQL_ENDPOINT = os.getenv('SPARQL_ENDPOINT', 'https://fuseki-copy-production.u
 SPARQL_USER     = os.getenv('SPARQL_USER', 'admin')
 SPARQL_PASSWORD = os.getenv('SPARQL_PASSWORD', '')
 
-# ── Logging para ver errores en Railway ──────────────────────────
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
     'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
-        },
+        'console': {'class': 'logging.StreamHandler'},
     },
     'root': {
         'handlers': ['console'],
@@ -110,7 +108,7 @@ LOGGING = {
     'loggers': {
         'django': {
             'handlers': ['console'],
-            'level': 'DEBUG',
+            'level': 'INFO',
             'propagate': False,
         },
         'django.request': {
@@ -120,7 +118,7 @@ LOGGING = {
         },
         'django.db.backends': {
             'handlers': ['console'],
-            'level': 'WARNING',  # solo errores de BD, no cada query
+            'level': 'WARNING',
             'propagate': False,
         },
     },
