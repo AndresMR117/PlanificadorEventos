@@ -17,18 +17,16 @@ class SPARQLService:
             auth = (self.user, self.password) if self.user and self.password else None
             response = requests.get(
                 self.endpoint,
-                data={'query': query_string},
+                params={'query': query_string},
                 headers={'Accept': 'application/json'},
                 auth=auth,
                 timeout=self.timeout,
             )
             if response.status_code == 200:
                 return self._parse_results(response.json())
-            print(f"Error SPARQL: {response.status_code}")
-            return []
+            return [{"status": response.status_code, "text": response.text}]
         except Exception as e:
-            print(f"Error de conexión SPARQL: {e}")
-            return []
+            return [{"error": str(e)}]
     
     def _parse_results(self, data: Dict) -> List[Dict]:
         results = []
