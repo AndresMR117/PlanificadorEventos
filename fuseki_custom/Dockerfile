@@ -1,10 +1,10 @@
 FROM stain/jena-fuseki
 
-RUN mkdir -p /fuseki/databases
-RUN mkdir -p /fuseki/templates
-RUN mkdir -p /fuseki/backups
-
-RUN chmod -R 777 /fuseki
+RUN mkdir -p /fuseki/databases \
+    && mkdir -p /fuseki/templates \
+    && mkdir -p /fuseki/backups \
+    && mkdir -p /fuseki/system \
+    && chmod -R 777 /fuseki
 
 ENV ADMIN_PASSWORD=admin123
 
