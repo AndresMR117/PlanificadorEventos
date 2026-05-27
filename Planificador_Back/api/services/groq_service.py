@@ -67,7 +67,7 @@ class GroqService:
     }
 
     def __init__(self):
-        self.api_key = os.getenv('OPENAI_API_KEY') or os.getenv('GROQ_API_KEY')
+        self.api_key = os.getenv('GROQ_API_KEY')
         if not self.api_key:
             print('[GROQ] ⚠️  GROQ_API_KEY no encontrada en .env')
         self.client = OpenAI(
