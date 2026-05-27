@@ -4,14 +4,12 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-tu-clave-secreta')
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
 ALLOWED_HOSTS = ['*']
 
-# Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -55,7 +53,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'backend_config.wsgi.application'
 
-# Base de datos - MySQL
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -66,7 +63,8 @@ DATABASES = {
         'PORT': os.getenv('MYSQL_PORT', '24799'),
         'OPTIONS': {
             'ssl': {'ca': None},
-        }
+            'connect_timeout': 10,
+        },
     }
 }
 
@@ -81,21 +79,49 @@ LANGUAGE_CODE = 'es-co'
 TIME_ZONE = 'America/Bogota'
 USE_I18N = True
 USE_TZ = True
-
 STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# CORS
 CORS_ALLOW_ALL_ORIGINS = True
 
-# REST Framework
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.AllowAny',
     ],
 }
 
-# Fuseki (Base de datos semántica)
 SPARQL_ENDPOINT = os.getenv('SPARQL_ENDPOINT', 'https://fuseki-copy-production.up.railway.app/eventos/sparql')
-SPARQL_USER = os.getenv('SPARQL_USER', 'admin')
-SPARQL_PASSWORD = os.getenv('SPARQL_PASSWORD', 'lumFKhDX8riGzeu')
+SPARQL_USER     = os.getenv('SPARQL_USER', 'admin')
+SPARQL_PASSWORD = os.getenv('SPARQL_PASSWORD', '')
+
+# ── Logging para ver errores en Railway ──────────────────────────
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'DEBUG',
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+        'django.request': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+        'django.db.backends': {
+            'handlers': ['console'],
+            'level': 'WARNING',  # solo errores de BD, no cada query
+            'propagate': False,
+        },
+    },
+}
