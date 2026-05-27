@@ -1,10 +1,13 @@
 import os
 from pathlib import Path
+from dotenv import load_dotenv
+
+load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-tu-clave-secreta'
-DEBUG = True
+SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-tu-clave-secreta')
+DEBUG = os.getenv('DEBUG', 'False') == 'True'
 ALLOWED_HOSTS = ['*']
 
 # Application definition
@@ -51,15 +54,18 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'backend_config.wsgi.application'
 
-# Base de datos - MySQL solo para usuarios
+# Base de datos - MySQL
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'planificador_eventos',
-        'USER': 'root',
-        'PASSWORD': 'root',
-        'HOST': 'localhost',
-        'PORT': '3306',
+        'NAME': os.getenv('MYSQL_DATABASE', 'planificador_eventos'),
+        'USER': os.getenv('MYSQL_USER', 'root'),
+        'PASSWORD': os.getenv('MYSQL_PASSWORD'),
+        'HOST': os.getenv('MYSQL_HOST', 'zephyr.proxy.rlwy.net'),
+        'PORT': os.getenv('MYSQL_PORT', '24799'),
+        'OPTIONS': {
+            'ssl': {'ca': None},
+        }
     }
 }
 
@@ -87,3 +93,11 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.AllowAny',
     ],
 }
+
+# Fuseki (Base de datos semántica)
+SPARQL_ENDPOINT = os.getenv('SPARQL_ENDPOINT', 'https://fuseki-copy-production.up.railway.app/eventos/sparql')
+SPARQL_USER = os.getenv('SPARQL_USER', 'admin')
+SPARQL_PASSWORD = os.getenv('SPARQL_PASSWORD', 'lumFKhDX8riGzeu')
+
+# Groq API
+GROQ_API_KEY = os.getenv('GROQ_API_KEY')

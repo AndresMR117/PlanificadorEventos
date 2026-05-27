@@ -1,9 +1,12 @@
+import os
 import requests
 from typing import List, Dict
 
 class SPARQLService:
     def __init__(self):
-        self.endpoint = "http://localhost:3030/Planificador_eventos/query"
+        # Leer endpoint desde variable de entorno o usar el de Railway por defecto
+        self.endpoint = os.getenv('SPARQL_ENDPOINT', 'https://fuseki-copy-production.up.railway.app/eventos/sparql')
+        print(f"[SPARQL] Usando endpoint: {self.endpoint}")
     
     def query(self, query_string: str) -> List[Dict]:
         try:
@@ -51,8 +54,6 @@ class SPARQLService:
         return self.query(query)
     
     def obtener_proveedores_destacados(self) -> List[Dict]:
-        # Sin LIMIT para devolver todos ordenados por calificacion.
-        # El caller decide cuántos mostrar.
         query = """
         PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
         PREFIX ev:  <http://eventos.caqueta.co/ontologia#>
