@@ -15,7 +15,7 @@ class SPARQLService:
 
         try:
             auth = (self.user, self.password) if self.user and self.password else None
-            response = requests.post(
+            response = requests.get(
                 self.endpoint,
                 data={'query': query_string},
                 headers={'Accept': 'application/json'},
