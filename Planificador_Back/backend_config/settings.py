@@ -4,6 +4,14 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+# === DIAGNÓSTICO Y CARGA FORZADA DE GROQ_API_KEY ===
+GROQ_API_KEY = os.getenv('GROQ_API_KEY') or os.environ.get('GROQ_API_KEY')
+if GROQ_API_KEY:
+    print(f"[DJANGO] GROQ_API_KEY cargada correctamente (primeros 10 chars): {GROQ_API_KEY[:10]}...")
+else:
+    print("[DJANGO] ERROR: GROQ_API_KEY no encontrada en el entorno")
+# ===================================================
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-tu-clave-secreta')
@@ -98,6 +106,3 @@ REST_FRAMEWORK = {
 SPARQL_ENDPOINT = os.getenv('SPARQL_ENDPOINT', 'https://fuseki-copy-production.up.railway.app/eventos/sparql')
 SPARQL_USER = os.getenv('SPARQL_USER', 'admin')
 SPARQL_PASSWORD = os.getenv('SPARQL_PASSWORD', 'lumFKhDX8riGzeu')
-
-# Groq API
-GROQ_API_KEY = os.getenv('GROQ_API_KEY')

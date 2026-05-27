@@ -67,9 +67,13 @@ class GroqService:
     }
 
     def __init__(self):
-        self.api_key = os.getenv('GROQ_API_KEY')
-        if not self.api_key:
-            print('[GROQ] ⚠️  GROQ_API_KEY no encontrada en .env')
+        # === CARGA FORZADA DE LA API KEY ===
+        self.api_key = os.getenv('GROQ_API_KEY') or os.environ.get('GROQ_API_KEY')
+        if self.api_key:
+            print(f'[GROQ] API key cargada correctamente (primeros 10 chars): {self.api_key[:10]}...')
+        else:
+            print('[GROQ] ERROR: GROQ_API_KEY no encontrada en el entorno')
+        
         self.client = OpenAI(
             api_key=self.api_key,
             base_url='https://api.groq.com/openai/v1'
